@@ -3,8 +3,9 @@
 #include "models/owner/owner.c"
 
 int main() {
-    struct owner _owner;
-    printf( CYAN "You mom Gaaay" RESET_COLOR);
-    readOwner(_owner).
-    printf("%s", _owner.nome);
+    struct owner *_owner = NULL;
+    alocaOwner(1, &_owner);
+    readOwner(_owner);
+    puts(_owner->nome);
+    printf("Oi");
 }

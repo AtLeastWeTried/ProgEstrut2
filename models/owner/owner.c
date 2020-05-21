@@ -9,7 +9,7 @@ struct owner {
     struct address saddress;
 };
 
-void readOwner(struct owner _owener) {
+void readOwner(struct owner *_owner) {
     printf("informe o nome: ");
-    gets(_owener.nome);
+    gets(_owner->nome);
 }
