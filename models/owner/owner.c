@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "../address/address.c"
+#include "../address/OwnerAddress.c"
 
 struct owner {
     char nome[80];
@@ -10,12 +10,15 @@ struct owner {
 };
 
 void readOwner(struct owner *_owner) {
-    printf("informe o nome: ");
+    printf("Informe o nome: ");
     gets(_owner->nome);
+    printf("Informe o CPF: ");
+    gets(_owner->CPF);
+    printf("Informe a quantidade de casas: ");
 }
 
-void aloca_owner(struct owner **p_owner,int tam){
-    if((*p_owner = (struct owner *)realloc(*p_owner, tam*sizeof(struct owner))) == NULL){
-        printf("\nNao contem espaço vago.");
+void aloca_owner(struct owner **p_owner, int tam){
+    if((*p_owner = (struct owner*)realloc(*p_owner, tam*sizeof(struct owner))) == NULL){
+        printf("\nNao contem espaco vago.");
     }
 }

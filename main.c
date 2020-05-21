@@ -4,8 +4,7 @@
 
 int main() {
     struct owner *_owner = NULL;
-    alocaOwner(1, &_owner);
+    aloca_owner(&_owner, 1);
     readOwner(_owner);
     puts(_owner->nome);
-    printf("Oi");
 }
