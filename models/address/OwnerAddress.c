@@ -33,3 +33,14 @@ struct address stdReadAddress() {
     gets(_address.email);
     return _address;
 }
+
+void stdWriteAddress(struct address _address) {
+    printf("Logradouro: %s\n", _address.logradouro);
+    printf("Bairro: %s\n", _address.bairro);
+    printf("CEP: %s\n", _address.CEP);
+    printf("Cidade: %s\n", _address.cidade);
+    printf("Estado: %s\n", _address.estado);
+    printf("Fone: %s\n", _address.fone);
+    printf("Cel: %s\n", _address.cel);
+    printf("Email: %s\n", _address.email);
+}

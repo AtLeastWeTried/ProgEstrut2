@@ -1,10 +1,13 @@
-#include <stdlib.h>
-#include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include "../../utils/colors.c"
 #include "../address/OwnerAddress.c"
 #include "../address/HouseAddress.c"
 
+#define DIRETORY "owner.bin" 
+
 struct owner {
+    int reg_prop;
     char nome[80];
     char CPF[15];
     int qntd_de_casas;
@@ -12,20 +15,46 @@ struct owner {
     struct informacao_casa sCasa;
 };
 
-void stdReadOwner(struct owner *_owner) {
+struct owner stdReadOwner() {
+    struct owner _owner;
     printf("Informe o nome: ");
     fflush(stdin);
-    gets(_owner->nome);
+    gets(_owner.nome);
     printf("Informe o CPF: ");
-    gets(_owner->CPF);
-    printf("Informe a quantidade de casas: ");
     fflush(stdin);
-    scanf("%d", _owner->qntd_de_casas);
+    gets(_owner.CPF);
+    _owner.qntd_de_casas = 0;
+    _owner.sAddress = stdReadAddress();
+    return _owner;
 }
 
-void aloca_owner(struct owner **p_owner, int tam){
-    if((*p_owner = (struct owner*)realloc(*p_owner, tam*sizeof(struct owner))) == NULL){
-        printf("\nNao contem espaco vago.");
-        exit(1);
+void stdWriteOwner(struct owner _owner) {
+    printf("Nome: %s\n", _owner.nome);
+    printf("CPF: %s\n", _owner.CPF);
+    printf("Casas: %d", _owner.sAddress);
+    stdWriteAddress(_owner.sAddress);
+}
+
+void writeOwner(struct owner _owner) {
+    FILE *file = fopen(DIRETORY, "ab");
+    if (file == NULL) {
+        printf(RED "Erro ao abrir o arquivo!\n" RESET_COLOR);
     }
+    else {
+        fwrite(&_owner, sizeof(struct owner), 1, file);
+    }
+    fclose(file);
+}
+
+struct owner readOwner() {
+    struct owner _owner;
+    FILE *file = fopen(DIRETORY, "rb");
+    if (file == NULL) {
+        printf(RED "Erro ao abrir o arquivo!\n" RESET_COLOR);
+    }
+    else {
+        fread(&_owner, sizeof(struct owner), EOF, file);
+    }
+    fclose(file);
+    return _owner;
 }
