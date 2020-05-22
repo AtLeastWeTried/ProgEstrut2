@@ -23,5 +23,6 @@ void readOwner(struct owner *_owner) {
 void aloca_owner(struct owner **p_owner, int tam){
     if((*p_owner = (struct owner*)realloc(*p_owner, tam*sizeof(struct owner))) == NULL){
         printf("\nNao contem espaco vago.");
+        exit(1);
     }
 }
