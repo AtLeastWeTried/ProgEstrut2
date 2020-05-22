@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include <stdio.h>
 #include "../address/OwnerAddress.c"
 
 struct owner {
@@ -15,6 +16,8 @@ void readOwner(struct owner *_owner) {
     printf("Informe o CPF: ");
     gets(_owner->CPF);
     printf("Informe a quantidade de casas: ");
+    fflush(stdin);
+    scanf("%d", _owner->qntd_de_casas);
 }
 
 void aloca_owner(struct owner **p_owner, int tam){
