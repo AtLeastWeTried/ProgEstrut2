@@ -3,7 +3,9 @@
 #include "models/owner/owner.c"
 
 int main() {
-    struct owner *_owner;
+    struct owner *_owner = NULL;
     aloca_owner(&_owner, 1);
-    printf("oi");
+    _owner->sAddress = stdReadAddress();
+    _owner->sCasa = stdReadHouse();
+    stdReadOwner(_owner);
 }

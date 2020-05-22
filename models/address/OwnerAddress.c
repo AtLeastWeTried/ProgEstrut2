@@ -29,7 +29,7 @@ struct address stdReadAddress() {
     gets(_address.fone);
     printf("informe o cel: ");
     gets(_address.cel);
-    printf("iforme o email: ");
+    printf("informe o email: ");
     gets(_address.email);
     return _address;
 }

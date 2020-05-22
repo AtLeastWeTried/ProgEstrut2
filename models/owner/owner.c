@@ -2,16 +2,19 @@
 #include <string.h>
 #include <stdio.h>
 #include "../address/OwnerAddress.c"
+#include "../address/HouseAddress.c"
 
 struct owner {
     char nome[80];
     char CPF[15];
     int qntd_de_casas;
-    struct address saddress;
+    struct address sAddress;
+    struct informacao_casa sCasa;
 };
 
-void readOwner(struct owner *_owner) {
+void stdReadOwner(struct owner *_owner) {
     printf("Informe o nome: ");
+    fflush(stdin);
     gets(_owner->nome);
     printf("Informe o CPF: ");
     gets(_owner->CPF);
