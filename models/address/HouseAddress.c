@@ -17,3 +17,9 @@ struct informacao_casa stdReadHouse() {
     scanf("%c", &casa.status_casa);
     return casa;
 }
+void stdWriteHouseAddress(struct informacao_casa _address) {
+    printf("----------Endereco da casa:----------");
+    printf("Numero da casa: %d\n", _address.num_casa);
+    printf("Status da casa: %c\n", _address.status_casa);
+    printf("----------Fim do endereco da casa----------");
+}

@@ -35,6 +35,7 @@ struct address stdReadAddress() {
 }
 
 void stdWriteAddress(struct address _address) {
+    printf("----------Endereco do owner:----------\n");
     printf("Logradouro: %s\n", _address.logradouro);
     printf("Bairro: %s\n", _address.bairro);
     printf("CEP: %s\n", _address.CEP);
@@ -43,4 +44,5 @@ void stdWriteAddress(struct address _address) {
     printf("Fone: %s\n", _address.fone);
     printf("Cel: %s\n", _address.cel);
     printf("Email: %s\n", _address.email);
+    printf("\n----------Fim do endereco do owner----------");
 }

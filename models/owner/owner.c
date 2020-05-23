@@ -24,15 +24,19 @@ struct owner stdReadOwner() {
     fflush(stdin);
     gets(_owner.CPF);
     _owner.qntd_de_casas = 0;
+    _owner.reg_prop = 0;
     _owner.sAddress = stdReadAddress();
+    _owner.sCasa = stdReadHouse();
     return _owner;
 }
 
 void stdWriteOwner(struct owner _owner) {
+    printf("----------Owner:----------");
     printf("Nome: %s\n", _owner.nome);
     printf("CPF: %s\n", _owner.CPF);
-    printf("Casas: %d", _owner.sAddress);
+    printf("----------Fim do owner----------");
     stdWriteAddress(_owner.sAddress);
+    stdWriteHouseAddress(_owner.sCasa);
 }
 
 void writeOwner(struct owner _owner) {
@@ -53,7 +57,7 @@ struct owner readOwner() {
         printf(RED "Erro ao abrir o arquivo!\n" RESET_COLOR);
     }
     else {
-        fread(&_owner, sizeof(struct owner), EOF, file);
+        fread(&_owner, sizeof(struct owner), 1, file);
     }
     fclose(file);
     return _owner;
