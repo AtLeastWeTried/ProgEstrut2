@@ -3,8 +3,13 @@
 #include "models/owner/owner.c"
 
 int main() {
-    struct owner _owner = stdReadOwner();
+    int i;
+    struct owner _owner = stdWriteOwner();
     writeOwner(_owner);
-    struct owner newOwner = readOwner();
-    stdWriteOwner(newOwner);
+    printf("%d", countOwners());
+    for (i = 1; i <= countOwners(); i++) {
+        printf("oi");
+        struct owner readingOwner = readOwner(i);
+        stdReadOwner(readingOwner);
+    }
 }

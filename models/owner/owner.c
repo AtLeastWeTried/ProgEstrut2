@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include "../../utils/colors.c"
 #include "../address/OwnerAddress.c"
-#include "../address/HouseAddress.c"
+#include "../address/HouseInfo.c"
 
-#define DIRETORY "owner.bin" 
+#define DIRECTORY "owner.bin" 
 
 struct owner {
     int reg_prop;
@@ -15,7 +15,26 @@ struct owner {
     struct informacao_casa sCasa;
 };
 
-struct owner stdReadOwner() {
+void alocaOwner(struct owner **_owner ,int tam) {
+    if((*_owner = (struct owner*)realloc(*_owner,tam*sizeof(struct owner)))==NULL)
+      exit(1);
+}
+
+int countOwners(){
+    long int cont = 0;
+    FILE *fptr = NULL;
+    if((fptr = fopen(DIRECTORY, "rb")) == NULL){
+        return cont;
+    }
+    else{
+        fseek(fptr, 0 , 2);
+        cont = ftell(fptr) / sizeof(struct owner);
+        fclose(fptr);
+        return cont;
+    }
+}
+
+struct owner stdWriteOwner() {
     struct owner _owner;
     printf("Informe o nome: ");
     fflush(stdin);
@@ -24,25 +43,25 @@ struct owner stdReadOwner() {
     fflush(stdin);
     gets(_owner.CPF);
     _owner.qntd_de_casas = 0;
-    _owner.reg_prop = 0;
-    _owner.sAddress = stdReadAddress();
-    _owner.sCasa = stdReadHouse();
+    _owner.reg_prop = countOwners();
+    _owner.sAddress = stdWriteAddress();
+    _owner.sCasa = stdWriteHouse();
     return _owner;
 }
 
-void stdWriteOwner(struct owner _owner) {
-    printf("----------Owner:----------");
+void stdReadOwner(struct owner _owner) {
+    printf("----------Owner----------\n");
     printf("Nome: %s\n", _owner.nome);
     printf("CPF: %s\n", _owner.CPF);
-    printf("----------Fim do owner----------");
-    stdWriteAddress(_owner.sAddress);
-    stdWriteHouseAddress(_owner.sCasa);
+    printf("Registro de proprietario: %d\n", _owner.reg_prop);
+    stdReadAddress(_owner.sAddress);
+    stdReadHouseAddress(_owner.sCasa);
 }
 
 void writeOwner(struct owner _owner) {
-    FILE *file = fopen(DIRETORY, "ab");
+    FILE *file = fopen(DIRECTORY, "ab");
     if (file == NULL) {
-        printf(RED "Erro ao abrir o arquivo!\n" RESET_COLOR);
+        printf("Erro ao abrir o arquivo!\n");
     }
     else {
         fwrite(&_owner, sizeof(struct owner), 1, file);
@@ -50,14 +69,14 @@ void writeOwner(struct owner _owner) {
     fclose(file);
 }
 
-struct owner readOwner() {
+struct owner readOwner(int n) {
     struct owner _owner;
-    FILE *file = fopen(DIRETORY, "rb");
+    FILE *file = fopen(DIRECTORY, "rb");
     if (file == NULL) {
-        printf(RED "Erro ao abrir o arquivo!\n" RESET_COLOR);
+        printf("Erro ao abrir o arquivo!\n");
     }
     else {
-        fread(&_owner, sizeof(struct owner), 1, file);
+        fread(&_owner, sizeof(struct owner), n, file);
     }
     fclose(file);
     return _owner;
