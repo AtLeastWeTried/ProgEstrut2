@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <string.h>
 #include "models/owner/owner.c"
+#include "models/house/house.c"
 
 int main() {
     int op;
-    char cpf[15];
+    char cpf[15], parametro;
     do {
         system("cls");
-        printf("[1] Cadastro de proprietario\n[2] Consulta total\n[3] Consulta parcial\n[4] Sair\nOpcao: ");
+        printf("[1] Cadastro de proprietario\n[2] Consulta total Owners\n[3] Consulta parcial Owners\n");
+        printf("[4] Consulta total Houses\n[5] Consulta parcial Houses\n [6]Sair\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
             case 1: 
@@ -28,8 +30,21 @@ int main() {
                 searchByCPF(cpf);
                 system("pause");
                 break;
-            case 4: printf("Fim do programa"); break;
+            case 4: 
+                system("cls"); 
+                printf("\nParametro da pesquisa [L]livre ou [O]ocupado:");
+                do{    
+                    scanf("%c", &parametro);
+                }while(parametro != 'L' && parametro != 'O');
+                fflush(stdin);
+                readHouses(parametro); 
+                break;
+            case 5: 
+                system("cls");
+
+                break;
+            case 6: printf("Fim do programa"); break;
             default: printf("Opcao nao existente"); break;
         }
-    } while (op != 4);
+    } while (op != 6);
 }
