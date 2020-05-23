@@ -14,6 +14,7 @@ struct house{
     float valor;
     union data status;
 };
+
 int countHouses(){
     long int cont = 0;
     FILE *fptr = NULL;
@@ -27,3 +28,45 @@ int countHouses(){
         return cont;
     }
 }
+
+void readHouses(char op) {
+    int i;
+    struct house _house;
+    FILE *file = fopen(DIRECTORY, "rb");
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+    else {
+        if(op == 'L'){    
+            for (i = 0; i < countHouses(); i++) {
+                fseek(file, i * sizeof(struct house), SEEK_SET);
+                fread(&_house, sizeof(struct house), 1, file);
+                if(_house.status.sigla == 'L')  
+                    stdReadH(_house);
+            }
+        }
+        else{
+            for (i = 0; i < countHouses(); i++) {
+                fseek(file, i * sizeof(struct house), SEEK_SET);
+                fread(&_house, sizeof(struct house), 1, file);
+                if(_house.status.sigla == 'O')  
+                    stdReadH(_house);
+            }
+        }
+    fclose(file);
+    }
+    system("pause");
+    
+}
+
+void stdReadH(struct house _house) {
+    printf("\n----------House----------\n");
+    stdReadHouse(_house.address);
+    stdReadHouseData(_house.status);
+    printf("Quartos: %d\n", _house.quartos);
+    printf("Area(m²): %f\n", _house.area);
+    printf("Registro da casa: %d\n", _house.reg_imov);
+    printf("Valor: %f\n",_house.valor);
+   
+}
+
