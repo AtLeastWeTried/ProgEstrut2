@@ -18,7 +18,7 @@ struct informacao_casa stdWriteHouseOwner() {
     return casa;
 }
 
-void stdReadHouseAddress(struct informacao_casa _address) {
+void stdReadOwnerHouseAddress(struct informacao_casa _address) {
     printf("\n\n----------Endereco da casa----------\n");
     printf("Numero da casa: %d\n", _address.num_casa);
     printf("Status da casa: %c\n", _address.status_casa);

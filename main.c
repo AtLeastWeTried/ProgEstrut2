@@ -8,9 +8,10 @@ int main() {
     int op;
     char cpf[15], parametro, opc;
     do {
+        fflush(stdin);
         system("cls");
         printf("[1] Cadastro de proprietario\n[2] Consulta Owners\n");
-        printf("[3] Consulta total Houses\n[4] Sair\nOpcao: ");
+        printf("[3] Consulta Casas\n[4] Sair\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
             case 1: 
@@ -41,10 +42,11 @@ int main() {
                 system("cls"); 
                 printf("\nParametro da pesquisa [L]livre ou [O]ocupado:");
                 do {    
+                    fflush(stdin);
                     scanf("%c", &parametro);
                 } while(parametro == 'L' && parametro == 'O' || parametro == 'l' && parametro == 'o');
                 fflush(stdin);
-                //readHouses(parametro); 
+                readHouses(parametro); 
                 break;
             case 4: printf("Fim do programa"); break;
             default: printf("Opcao nao existente"); break;

@@ -60,7 +60,7 @@ void stdReadOwner(struct owner _owner) {
     printf("CPF: %s\n", _owner.CPF);
     printf("Registro de proprietario: %d\n", _owner.reg_prop);
     stdReadAddressOwner(_owner.sAddress);
-    stdReadHouseAddress(_owner.sCasa);
+    stdReadOwnerHouseAddress(_owner.sCasa);
 }
 
 void readOwners() {
