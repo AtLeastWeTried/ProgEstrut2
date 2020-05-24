@@ -1,11 +1,21 @@
 #include <stdlib.h>
-#include <stdio.h>
 #include <string.h>
-#include "./models/owner/owner.c"
-#include "./models/house/house.c"
+#include <stdio.h>
+#include <ctype.h>
+#include "models/owner/owner.c"
+#include "models/house/house.c"
+#include "models/house/WriteHouse.c"
 
 int main() {
-    int op;
+    //struct house _house;
+    //stdWriteHouse(_house);
+    //stdReadHouse(_house);
+    
+    
+    
+    
+    
+    /*int op;
     char cpf[15], parametro, opc;
     do {
         fflush(stdin);
@@ -51,5 +61,5 @@ int main() {
             case 4: printf("Fim do programa"); break;
             default: printf("Opcao nao existente"); break;
         }
-    } while (op != 4);
+    } while (op != 4);*/
 }

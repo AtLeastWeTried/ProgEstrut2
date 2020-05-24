@@ -1,7 +1,4 @@
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
-#include "./WriteHouse.c"
+#include "WriteHouse.c"
 
 void stdReadHouseData(union data _data){
     printf("\nSigla da casa: %s", _data.sigla);
