@@ -77,33 +77,42 @@ void stdReadAddressOwner(struct addressOwner _address);
 void stdReadOwnerHouseAddress(struct informacao_casa _address);
 
 //HOUSE
-void stdReadHouseData(union data _data);
 void stdReadHouseAddress(struct houseAddress _house);
 void stdReadHouse(struct house _house);
 void readHouses(char op);
 int countHouses();
 struct house stdWriteHouse();
+void writeHouse (struct house _house);
 
 int main() { 
     int op;
     char cpf[15], parametro, opc;
+    struct house _house;
+    struct owner  _owner;
     do {
         fflush(stdin);
         system("cls");
-        printf("[1] Cadastro de proprietario\n[2] Consulta Owners\n[3] Consulta Casas\n[4] Sair\nOpcao: ");
+        printf("[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta owners\n[4] Consulta casas\n[5] Sair\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
             case 1: 
                 system("cls");
-                struct owner _owner = stdWriteOwner();
+                _owner = stdWriteOwner();
                 writeOwner(_owner);
                 break;
             case 2:
+                system("cls");
+                _house = stdWriteHouse();
+                writeHouse(_house);
+            break;
+            case 3:
+            system("cls");
                 do {
                     printf("\nDeseja realizar uma consulta [T]total ou [P]parcial: ");
                     fflush(stdin);
                     scanf("%c", &opc);
-                } while (opc == 'T' && opc == 'P' || opc == 't' && opc == 'p');
+                    opc = toupper(opc);
+                } while (opc != 'T' && opc != 'P');
                 if (opc == 'T' || opc == 't') {
                     system("cls"); 
                     readOwners();  
@@ -117,20 +126,22 @@ int main() {
                     system("pause");
                 }
                 break;
-            case 3: 
+            
+            case 4: 
                 system("cls"); 
-                printf("\nParametro da pesquisa [L]livre ou [O]ocupado:");
                 do {    
+                    printf("\nParametro da pesquisa [L]livre ou [A]alugado:");
                     fflush(stdin);
                     scanf("%c", &parametro);
-                } while(parametro == 'L' && parametro == 'O' || parametro == 'l' && parametro == 'o');
+                    parametro = toupper(parametro);
+                } while(parametro != 'L' && parametro != 'A');
                 fflush(stdin);
                 readHouses(parametro); 
                 break;
-            case 4: printf("Fim do programa"); break;
+            case 5: printf("Fim do programa"); break;
             default: printf("Opcao nao existente"); break;
         }
-    } while (op != 4);
+    } while (op != 5);
 }
 
 // OWNER CODES --- OWNER CODES --- OWNER CODES --- OWNER CODES --- OWNER CODES //
@@ -230,9 +241,9 @@ void readOwners() {
             fread(&_owner, sizeof(struct owner), 1, file);
             stdReadOwner(_owner);
         }
+    fclose(file);
     }
     system("pause");
-    fclose(file);
 }
 
 void searchByCPF(char cpf[15]) {
@@ -255,9 +266,9 @@ void searchByCPF(char cpf[15]) {
                 }
             }
         }
+        fclose(file);
     }
     printf("\nNenhum proprietario encontrado com este cpf\n");
-    fclose(file);
 }
 
 // ENDERECO DO OWNER
@@ -283,10 +294,6 @@ void stdReadOwnerHouseAddress(struct informacao_casa _address) {
 // HOUSE CODES --- HOUSE CODES --- HOUSE CODES --- HOUSE CODES --- HOUSE CODES //
 
 //READ CODES
-void stdReadHouseData(union data _data){
-    printf("\nSigla da casa: %s", _data.sigla);
-}
-
 void stdReadHouseAddress(struct houseAddress _house) {
     printf("Logradouro da casa: %s\n", _house.logradouro);
     printf("Bairro da casa: %s\n", _house.bairro);
@@ -297,17 +304,17 @@ void stdReadHouseAddress(struct houseAddress _house) {
 void stdReadHouse(struct house _house) {
     printf("\n----------Casa----------\n");
     printf("Quartos: %d\n", _house.quartos);
-    printf("Area(m²): %f\n", _house.area);
+    printf("Area(m2): %.2f\n", _house.area);
     printf("Registro da casa: %d\n", _house.reg_imov);
-    printf("Valor: %f\n",_house.valor);
-    stdReadHouseData(_house.status);
+    printf("Valor: %.2f\n",_house.valor);
+    printf("\nStatus da casa: %c\n", _house.status.sigla);
     stdReadHouseAddress(_house.address);
 }
 
 void readHouses(char op) {
     int i;
     struct house _house;
-    FILE *file = fopen(DIRECTORY, "rb");
+    FILE *file = fopen(FILE_NAME, "rb");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo!\n");
     }
@@ -324,7 +331,7 @@ void readHouses(char op) {
             for (i = 0; i < countHouses(); i++) {
                 fseek(file, i * sizeof(struct house), SEEK_SET);
                 fread(&_house, sizeof(struct house), 1, file);
-                if(_house.status.sigla == 'O')  
+                if(_house.status.sigla == 'A')  
                     stdReadHouse(_house);
             }
         }
@@ -373,10 +380,21 @@ struct house stdWriteHouse() {
     fflush(stdin);
     gets(_house.address.cidade);
     do {
-        printf("\nSigla A para alugado, L para livre");
+        printf("\nStatus A para alugado, L para livre: ");
         fflush(stdin);
         scanf("%c", &_house.status.sigla);
-        toupper(_house.status.sigla);
-    } while(_house.status.sigla == 'L' || _house.status.sigla == 'A');
+        _house.status.sigla = toupper(_house.status.sigla);
+    } while(_house.status.sigla != 'L' && _house.status.sigla != 'A');
     return _house;
+}
+
+void writeHouse (struct house _house) {
+    FILE *file = fopen(FILE_NAME, "ab");
+    if (file == NULL) {
+        printf("\nErro ao abrir o arquivo!");
+    }
+    else {
+        fwrite(&_house, sizeof(struct house), 1, file);
+    }
+    fclose(file);
 }
