@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../utils/colors.c"
-#include "../address/OwnerAddress.c"
-#include "../address/HouseInfo.c"
+#include "./OwnerHouse.c"
+#include "./OwnerAddress.c"
 
 #define DIRECTORY "owner.bin" 
 
@@ -11,14 +10,9 @@ struct owner {
     char nome[80];
     char CPF[15];
     int qntd_de_casas;
-    struct address sAddress;
+    struct addressOwner sAddress;
     struct informacao_casa sCasa;
 };
-
-void alocaOwner(struct owner **_owner ,int tam) {
-    if((*_owner = (struct owner*)realloc(*_owner,tam*sizeof(struct owner)))==NULL)
-      exit(1);
-}
 
 int countOwners(){
     long int cont = 0;
@@ -44,18 +38,9 @@ struct owner stdWriteOwner() {
     gets(_owner.CPF);
     _owner.qntd_de_casas = 0;
     _owner.reg_prop = countOwners();
-    _owner.sAddress = stdWriteAddress();
-    _owner.sCasa = stdWriteHouse();
+    _owner.sAddress = stdWriteAddressOwner();
+    _owner.sCasa = stdWriteHouseOwner();
     return _owner;
-}
-
-void stdReadOwner(struct owner _owner) {
-    printf("\n----------Owner----------\n");
-    printf("Nome: %s\n", _owner.nome);
-    printf("CPF: %s\n", _owner.CPF);
-    printf("Registro de proprietario: %d\n", _owner.reg_prop);
-    stdReadAddress(_owner.sAddress);
-    stdReadHouseAddress(_owner.sCasa);
 }
 
 void writeOwner(struct owner _owner) {
@@ -67,6 +52,15 @@ void writeOwner(struct owner _owner) {
         fwrite(&_owner, sizeof(struct owner), 1, file);
     }
     fclose(file);
+}
+
+void stdReadOwner(struct owner _owner) {
+    printf("\n----------Owner----------\n");
+    printf("Nome: %s\n", _owner.nome);
+    printf("CPF: %s\n", _owner.CPF);
+    printf("Registro de proprietario: %d\n", _owner.reg_prop);
+    stdReadAddressOwner(_owner.sAddress);
+    stdReadHouseAddress(_owner.sCasa);
 }
 
 void readOwners() {

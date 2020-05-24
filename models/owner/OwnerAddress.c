@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 
-struct address{
+struct addressOwner{
     char logradouro[80];
     char bairro[20];
     char CEP[10];
@@ -13,8 +13,8 @@ struct address{
     char email[30];
 };
 
-struct address stdWriteAddress() {
-    struct address _address;
+struct addressOwner stdWriteAddressOwner() {
+    struct addressOwner _address;
     printf("informe o logradouro: "); 
     gets(_address.logradouro);
     printf("inform o bairro: ");
@@ -34,7 +34,7 @@ struct address stdWriteAddress() {
     return _address;
 }
 
-void stdReadAddress(struct address _address) {
+void stdReadAddressOwner(struct addressOwner _address) {
     printf("----------Endereco do owner----------\n");
     printf("Logradouro: %s\n", _address.logradouro);
     printf("Bairro: %s\n", _address.bairro);

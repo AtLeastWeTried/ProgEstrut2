@@ -1,16 +1,16 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "models/owner/owner.c"
-#include "models/house/house.c"
+#include "./models/owner/owner.c"
+#include "./models/house/house.c"
 
 int main() {
     int op;
-    char cpf[15], parametro;
+    char cpf[15], parametro, opc;
     do {
         system("cls");
-        printf("[1] Cadastro de proprietario\n[2] Consulta total Owners\n[3] Consulta parcial Owners\n");
-        printf("[4] Consulta total Houses\n[5] Consulta parcial Houses\n [6]Sair\nOpcao: ");
+        printf("[1] Cadastro de proprietario\n[2] Consulta Owners\n");
+        printf("[3] Consulta total Houses\n[4] Sair\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
             case 1: 
@@ -18,33 +18,36 @@ int main() {
                 struct owner _owner = stdWriteOwner();
                 writeOwner(_owner);
                 break;
-            case 2: 
-                system("cls"); 
-                readOwners(); 
+            case 2:
+                do {
+                    printf("\nDeseja realizar uma consulta [T]total ou [P]parcial: ");
+                    fflush(stdin);
+                    scanf("%c", &opc);
+                } while (opc == 'T' && opc == 'P' || opc == 't' && opc == 'p');
+                if (opc == 'T' || opc == 't') {
+                    system("cls"); 
+                    readOwners();  
+                }
+                else if (opc == 'P' || opc == 'p') {
+                    system("cls");
+                    printf("Informe o CPF: ");
+                    fflush(stdin);
+                    gets(cpf);
+                    searchByCPF(cpf);
+                    system("pause");
+                }
                 break;
             case 3: 
-                system("cls");
-                printf("Informe o CPF: ");
-                fflush(stdin);
-                gets(cpf);
-                searchByCPF(cpf);
-                system("pause");
-                break;
-            case 4: 
                 system("cls"); 
                 printf("\nParametro da pesquisa [L]livre ou [O]ocupado:");
-                do{    
+                do {    
                     scanf("%c", &parametro);
-                }while(parametro != 'L' && parametro != 'O');
+                } while(parametro == 'L' && parametro == 'O' || parametro == 'l' && parametro == 'o');
                 fflush(stdin);
-                readHouses(parametro); 
+                //readHouses(parametro); 
                 break;
-            case 5: 
-                system("cls");
-
-                break;
-            case 6: printf("Fim do programa"); break;
+            case 4: printf("Fim do programa"); break;
             default: printf("Opcao nao existente"); break;
         }
-    } while (op != 6);
+    } while (op != 4);
 }

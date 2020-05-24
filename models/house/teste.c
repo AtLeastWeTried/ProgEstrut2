@@ -1,12 +1,13 @@
-/*#include <stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "../owner/OwnerHouse.c"
 
 #define DIRECTORY "house.bin" 
 
 union data{
     char sigla;
-    //struct informacao_casa loc;
+    struct informacao_casa loc;
 
 };
 
