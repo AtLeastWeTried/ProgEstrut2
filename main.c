@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#define FILE_NAME "house.bin" 
-#define DIRECTORY "owner.bin" 
+#define FILE_NAME "house.bin"   //Arquivo contendo os dados da struct House
+#define DIRECTORY "owner.bin"    //Arquivo contendo os dados da struct Owner
 
 // STRUCTS --- STRUCTS --- STRUCTS --- STRUCTS --- STRUCTS //
 
@@ -65,24 +65,24 @@ struct house {
 
 // ESCOPOS FUNÇÕES --- ESCOPOS FUNÇÕES --- ESCOPOS FUNÇÕES --- ESCOPOS FUNÇÕES 
 //OWNER
-int countOwners();
-struct addressOwner stdWriteAddressOwner();
-struct owner stdWriteOwner();
-struct informacao_casa stdWriteHouseOwner();
-void writeOwner(struct owner _owner);
-void stdReadOwner(struct owner _owner);
-void readOwners();
-void searchByCPF(char cpf[15]);
-void stdReadAddressOwner(struct addressOwner _address);
-void stdReadOwnerHouseAddress(struct informacao_casa _address);
+int countOwners();  //Contador de dados que existem no arquivo
+struct addressOwner stdWriteAddressOwner(); //Cadastro da struct addressOwner
+struct owner stdWriteOwner();   //Cadastro da struct geral owner
+struct informacao_casa stdWriteHouseOwner();    //Cadastro da struct informacao_casa
+void writeOwner(struct owner _owner);   //Escrita dos dados Owner para o arquivo
+void stdReadOwner(struct owner _owner); //Mostra dos dados salvos referente ao Owner
+void readOwners();  //Leitura dos dados contidos no arquivo referente ao owner
+void searchByCPF(char cpf[15]); //Função para busca com filtro referente ao CPF
+void stdReadAddressOwner(struct addressOwner _address); //Mostra dos dados da struct addressOwner
+void stdReadOwnerHouseAddress(struct informacao_casa _address); //Mostra dos dados da struct informacao_casa
 
 //HOUSE
-void stdReadHouseAddress(struct houseAddress _house);
-void stdReadHouse(struct house _house);
-void readHouses(char op);
-int countHouses();
-struct house stdWriteHouse();
-void writeHouse (struct house _house);
+void stdReadHouseAddress(struct houseAddress _house);   //Mostra dos dados referente a struct houseAddress
+void stdReadHouse(struct house _house);     //Mostra dos dados referente a struct House
+void readHouses(char op);   //Função da leitura dos dados adquiridos dentro do arquivo
+int countHouses();  //Contador de quantos dados existem dentro do arquivo
+struct house stdWriteHouse();   //Cadastro dos dados referente a struct House   
+void writeHouse (struct house _house);  //Escrita dos dados house no arquivo
 
 int main() { 
     int op;
@@ -147,21 +147,21 @@ int main() {
 // OWNER CODES --- OWNER CODES --- OWNER CODES --- OWNER CODES --- OWNER CODES //
 
 //  OWNER GERAL
-int countOwners(){
+int countOwners(){  // Contagem dos dados contidos no arquivo owner.bin
     long int cont = 0;
     FILE *fptr = NULL;
     if((fptr = fopen(DIRECTORY, "rb")) == NULL){
-        return cont;
+        return cont;    //Retornaria 0 pois o arquivo ainda não existe.
     }
     else{
         fseek(fptr, 0 , 2);
         cont = ftell(fptr) / sizeof(struct owner);
         fclose(fptr);
-        return cont;
+        return cont;    //Retorna quantos dados dessa struct existem no arquivo owner.bin
     }
 }
 
-struct addressOwner stdWriteAddressOwner() {
+struct addressOwner stdWriteAddressOwner() {    //Função de cadastro básico referente a struct AddressOwner dentro da struct central owner.
     struct addressOwner _address;
     printf("informe o logradouro: "); 
     gets(_address.logradouro);
@@ -179,10 +179,10 @@ struct addressOwner stdWriteAddressOwner() {
     gets(_address.cel);
     printf("informe o email: ");
     gets(_address.email);
-    return _address;
+    return _address;    //Retorna a nova struct.
 }
 
-struct owner stdWriteOwner() {
+struct owner stdWriteOwner() {  //Cadastro da struct Owner
     struct owner _owner;
     printf("Informe o nome: ");
     fflush(stdin);
@@ -190,14 +190,14 @@ struct owner stdWriteOwner() {
     printf("Informe o CPF: ");
     fflush(stdin);
     gets(_owner.CPF);
-    _owner.qntd_de_casas = 0;
-    _owner.reg_prop = countOwners();
-    _owner.sAddress = stdWriteAddressOwner();
-    _owner.sCasa = stdWriteHouseOwner();
-    return _owner;
+    _owner.qntd_de_casas = 0; 
+    _owner.reg_prop = 1 + countOwners();   //retorna quantos dados existem dentro do arquivo + 1 pois é um novo dado.
+    _owner.sAddress = stdWriteAddressOwner();   //Escrita da struct interna addressOwner e retornando a mesma preenchida.
+    _owner.sCasa = stdWriteHouseOwner();    //Escrita da struct interna informacao_casa e retornando a mesma preenchida.
+    return _owner;  //Retorna a struct Owner toda preenchida.
 }
 
-struct informacao_casa stdWriteHouseOwner() {
+struct informacao_casa stdWriteHouseOwner() {   //Cadastro da struct interna informacao_casa
     struct informacao_casa casa;
     printf("\nInforme o numero da casa: ");
     fflush(stdin);
@@ -205,10 +205,10 @@ struct informacao_casa stdWriteHouseOwner() {
     printf("\nInforme o status da casa: ");
     fflush(stdin);
     scanf("%c", &casa.status_casa);
-    return casa;
+    return casa;    //Retorna a struct prenchida
 }
 
-void writeOwner(struct owner _owner) {
+void writeOwner(struct owner _owner) {  //Função de escrita dos dados no arquivo.
     FILE *file = fopen(DIRECTORY, "ab");
     if (file == NULL) {
         printf("Erro ao abrir o arquivo!\n");
@@ -216,22 +216,22 @@ void writeOwner(struct owner _owner) {
     else {
         fwrite(&_owner, sizeof(struct owner), 1, file);
     }
-    fclose(file);
+    fclose(file);   //Fechamento do arquivo
 }
 
-void stdReadOwner(struct owner _owner) {
+void stdReadOwner(struct owner _owner) {    //Função de mostra dos dados referente ao owner.
     printf("\n----------Owner----------\n");
     printf("Nome: %s\n", _owner.nome);
     printf("CPF: %s\n", _owner.CPF);
     printf("Registro de proprietario: %d\n", _owner.reg_prop);
-    stdReadAddressOwner(_owner.sAddress);
-    stdReadOwnerHouseAddress(_owner.sCasa);
+    stdReadAddressOwner(_owner.sAddress);   //Função que mostra os dados da struct interna addressOwner
+    stdReadOwnerHouseAddress(_owner.sCasa); //Função que mostra os dados da struct interna informacao_casa
 }
 
-void readOwners() {
+void readOwners() { //Função geral de Leitura dos dados
     int i;
     struct owner _owner;
-    FILE *file = fopen(DIRECTORY, "rb");
+    FILE *file = fopen(DIRECTORY, "rb");    //Abertura do arquivo para a leitura
     if (file == NULL) {
         printf("Erro ao abrir o arquivo!\n");
     }
@@ -239,17 +239,17 @@ void readOwners() {
         for (i = 0; i < countOwners(); i++) {
             fseek(file, i * sizeof(struct owner), SEEK_SET);
             fread(&_owner, sizeof(struct owner), 1, file);
-            stdReadOwner(_owner);
+            stdReadOwner(_owner);   //Função de leitura da struct adquirida.
         }
-    fclose(file);
+    fclose(file);   //Fechamento do arquivo
     }
     system("pause");
 }
 
-void searchByCPF(char cpf[15]) {
+void searchByCPF(char cpf[15]) {    //Função para busca dos dados que se encontram com o CPF requerido
     int i, j, cmp;
     struct owner _owner;
-    FILE *file = fopen(DIRECTORY, "rb");
+    FILE *file = fopen(DIRECTORY, "rb");    //Abertura do arquivo para leitura
     if (file == NULL) {
         printf("Erro ao abrir o arquivo!\n");
     }
@@ -258,10 +258,10 @@ void searchByCPF(char cpf[15]) {
             fseek(file, i * sizeof(struct owner), SEEK_SET);
             fread(&_owner, sizeof(struct owner), 1, file);
             for (j = 0; j <= 15; j++) {
-                cmp = strcmp(_owner.CPF, cpf);
-                if (cmp == 0) {
+                cmp = strcmp(_owner.CPF, cpf);  //Comparação com o cpf passado com o atual dado pelo read
+                if (cmp == 0) {    //Parametro que limita a leitura dos dados. 
                     fclose(file);
-                    stdReadOwner(_owner);
+                    stdReadOwner(_owner);//Leitura da struct achada
                     return;
                 }
             }
@@ -272,7 +272,7 @@ void searchByCPF(char cpf[15]) {
 }
 
 // ENDERECO DO OWNER
-void stdReadAddressOwner(struct addressOwner _address) {
+void stdReadAddressOwner(struct addressOwner _address) {    //Leitura da struct addressOwner vinda da struct owner
     printf("----------Endereco do owner----------\n");
     printf("Logradouro: %s\n", _address.logradouro);
     printf("Bairro: %s\n", _address.bairro);
@@ -285,7 +285,7 @@ void stdReadAddressOwner(struct addressOwner _address) {
 }
 
 // CASA DO OWNER
-void stdReadOwnerHouseAddress(struct informacao_casa _address) {
+void stdReadOwnerHouseAddress(struct informacao_casa _address) {    //Leitura da struct informação_casa vinda da struct owner
     printf("\n\n----------Endereco da casa----------\n");
     printf("Numero da casa: %d\n", _address.num_casa);
     printf("Status da casa: %c\n", _address.status_casa);
@@ -294,68 +294,68 @@ void stdReadOwnerHouseAddress(struct informacao_casa _address) {
 // HOUSE CODES --- HOUSE CODES --- HOUSE CODES --- HOUSE CODES --- HOUSE CODES //
 
 //READ CODES
-void stdReadHouseAddress(struct houseAddress _house) {
+void stdReadHouseAddress(struct houseAddress _house) { //Leitura dos dados referente a struct houseAddress
     printf("Logradouro da casa: %s\n", _house.logradouro);
     printf("Bairro da casa: %s\n", _house.bairro);
     printf("CEP da casa: %s\n", _house.CEP);
     printf("Cidade da casa: %s\n", _house.cidade);
 }
 
-void stdReadHouse(struct house _house) {
+void stdReadHouse(struct house _house) {    //Leitura dos dados referente a struct geral house
     printf("\n----------Casa----------\n");
     printf("Quartos: %d\n", _house.quartos);
     printf("Area(m2): %.2f\n", _house.area);
     printf("Registro da casa: %d\n", _house.reg_imov);
     printf("Valor: %.2f\n",_house.valor);
     printf("\nStatus da casa: %c\n", _house.status.sigla);
-    stdReadHouseAddress(_house.address);
+    stdReadHouseAddress(_house.address);   //Função que fará a leitura da struct interna de House.
 }
 
-void readHouses(char op) {
+void readHouses(char op) {  //Função de leitura de Arquivo binário  
     int i;
     struct house _house;
-    FILE *file = fopen(FILE_NAME, "rb");
+    FILE *file = fopen(FILE_NAME, "rb");    //Abertura do Arquivo
     if (file == NULL) {
         printf("Erro ao abrir o arquivo!\n");
     }
     else {
-        if(op == 'L') {    
+        if(op == 'L'){  //Parâmetro para exibição de dados contendo sigla == L    
             for (i = 0; i < countHouses(); i++) {
                 fseek(file, i * sizeof(struct house), SEEK_SET);
                 fread(&_house, sizeof(struct house), 1, file);
-                if(_house.status.sigla == 'L')  
+                if(_house.status.sigla == 'L')  //Parâmetro para exibição de dados contendo sigla == L
                     stdReadHouse(_house);
             }
         }
-        else {
+        else {      //Parâmetro para exibição de dados contendo sigla == A
             for (i = 0; i < countHouses(); i++) {
                 fseek(file, i * sizeof(struct house), SEEK_SET);
                 fread(&_house, sizeof(struct house), 1, file);
-                if(_house.status.sigla == 'A')  
+                if(_house.status.sigla == 'A')  //Parâmetro para exibição de dados contendo sigla == A
                     stdReadHouse(_house);
             }
         }
-    fclose(file);
+    fclose(file);   //Fechamento do arquivo
     }
     system("pause");
 }
 
 // WRITE FUNCTIONS
-int countHouses() {
+int countHouses(){  //Função para a contagem e retorno da quantidade de dados existente no arquivo referente a Houses
     long int cont = 0;
     FILE *fptr = NULL;
-    if((fptr = fopen(FILE_NAME, "rb")) == NULL){
-        return cont;
+    if((fptr = fopen(FILE_NAME, "rb")) == NULL){//Abertura do Arquivo
+        return cont;    //Caso ele não ache, o retorno será 0 pois o arquivo não existe ainda;
     }
     else{
         fseek(fptr, 0 , 2);
-        cont = ftell(fptr) / sizeof(struct house);
-        fclose(fptr);
-        return cont;
+        cont = ftell(fptr) / sizeof(struct house);      //Retorno da quantidade dos dados
+        fclose(fptr);    //Fechamento do arquivo
+        return cont;    //Retorna a quantidade calculada de dados existentes.
     }
 }
 
-struct house stdWriteHouse() {
+struct house stdWriteHouse() {     //Função de cadastro básico da struct house
     struct house _house;
     printf("\n----------Dados da casa----------\n");
     printf("\nArea em metros quadrados da casa: ");
@@ -385,10 +385,10 @@ struct house stdWriteHouse() {
         scanf("%c", &_house.status.sigla);
         _house.status.sigla = toupper(_house.status.sigla);
     } while(_house.status.sigla != 'L' && _house.status.sigla != 'A');
-    return _house;
+    return _house;  //Retorna a nova struct
 }
 
-void writeHouse (struct house _house) {
+void writeHouse (struct house _house) {  //Escrita dos dados armazenados na Ram para o arquivo house.bin
     FILE *file = fopen(FILE_NAME, "ab");
     if (file == NULL) {
         printf("\nErro ao abrir o arquivo!");
