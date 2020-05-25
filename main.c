@@ -83,16 +83,19 @@ void readHouses(char op);   //Função da leitura dos dados adquiridos dentro do
 int countHouses();  //Contador de quantos dados existem dentro do arquivo
 struct house stdWriteHouse();   //Cadastro dos dados referente a struct House   
 void writeHouse (struct house _house);  //Escrita dos dados house no arquivo
+void readHouseBairro(char bairro[20]);
+void readHouseRoom(int quartos);
+void readHouseArea(float area);
 
 int main() { 
     int op;
-    char cpf[15], parametro, opc;
+    char cpf[15], parametro, opc, escolha;
     struct house _house;
     struct owner  _owner;
     do {
         fflush(stdin);
         system("cls");
-        printf("[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta owners\n[4] Consulta casas\n[5] Sair\nOpcao: ");
+        printf("[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5] Sair\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
             case 1: 
@@ -113,11 +116,11 @@ int main() {
                     scanf("%c", &opc);
                     opc = toupper(opc);
                 } while (opc != 'T' && opc != 'P');
-                if (opc == 'T' || opc == 't') {
+                if (opc == 'T') {
                     system("cls"); 
                     readOwners();  
                 }
-                else if (opc == 'P' || opc == 'p') {
+                else if (opc == 'P') {
                     system("cls");
                     printf("Informe o CPF: ");
                     fflush(stdin);
@@ -129,19 +132,59 @@ int main() {
             
             case 4: 
                 system("cls"); 
-                do {    
-                    printf("\nParametro da pesquisa [L]livre ou [A]alugado:");
+                do {
+                    printf("\nDeseja fazer uma consula [T]total ou  [P]parcial: ");
                     fflush(stdin);
-                    scanf("%c", &parametro);
-                    parametro = toupper(parametro);
-                } while(parametro != 'L' && parametro != 'A');
-                fflush(stdin);
-                readHouses(parametro); 
+                    scanf("%c", &escolha);
+                    escolha = toupper(escolha);
+                } while(escolha != 'T' && escolha != 'P');
+                if (escolha == 'T') {
+                    do {    
+                        printf("\nParametro da pesquisa [L]livre ou [A]alugado: ");
+                        fflush(stdin);
+                        scanf("%c", &parametro);
+                        parametro = toupper(parametro);
+                    } while(parametro != 'L' && parametro != 'A');
+                    fflush(stdin);
+                    readHouses(parametro); 
+                }
+                else {
+                    system("cls");
+                    float area;
+                    int quartos, opp;
+                    char bairro[20];
+                    do {
+                        system("cls");
+                        printf("\nDeseja fazer consulta com:\n[1] Area util\n[2] Quantidade de quartos\n[3] Bairro\nOpcao: ");
+                        scanf("%d", &opp);
+                    } while(opp <1 || opp >3);
+                    system("cls");
+                    switch (opp) {
+                        case 1: 
+                            printf("\nArea util: ");
+                            scanf("%f", &area);
+                            readHouseArea(area);
+                            break;
+                        case 2: 
+                            printf("\nQuantidade de quartos: ");
+                            scanf("%d", &quartos);
+                            readHouseRoom(quartos);
+                            break;
+                        case 3:
+                            printf("Bairro: ");
+                            fflush(stdin);
+                            gets(bairro);
+                            readHouseBairro(bairro);
+                            break;
+                        default: printf("Easteregg, Achievement Unlocked"); break;
+                    }
+                }
                 break;
             case 5: printf("Fim do programa"); break;
             default: printf("Opcao nao existente"); break;
         }
     } while (op != 5);
+    system("cls");
 }
 
 // OWNER CODES --- OWNER CODES --- OWNER CODES --- OWNER CODES --- OWNER CODES //
@@ -191,7 +234,7 @@ struct owner stdWriteOwner() {  //Cadastro da struct Owner
     fflush(stdin);
     gets(_owner.CPF);
     _owner.qntd_de_casas = 0; 
-    _owner.reg_prop = 1 + countOwners();   //retorna quantos dados existem dentro do arquivo + 1 pois é um novo dado.
+    _owner.reg_prop = 1 + countOwners();   //retorna quantos dados existem dentro do arquivo + 1 para o registro do proprietario começar em 1.
     _owner.sAddress = stdWriteAddressOwner();   //Escrita da struct interna addressOwner e retornando a mesma preenchida.
     _owner.sCasa = stdWriteHouseOwner();    //Escrita da struct interna informacao_casa e retornando a mesma preenchida.
     return _owner;  //Retorna a struct Owner toda preenchida.
@@ -220,7 +263,7 @@ void writeOwner(struct owner _owner) {  //Função de escrita dos dados no arqui
 }
 
 void stdReadOwner(struct owner _owner) {    //Função de mostra dos dados referente ao owner.
-    printf("\n----------Owner----------\n");
+    printf("\n----------Proprietario----------\n");
     printf("Nome: %s\n", _owner.nome);
     printf("CPF: %s\n", _owner.CPF);
     printf("Registro de proprietario: %d\n", _owner.reg_prop);
@@ -273,7 +316,7 @@ void searchByCPF(char cpf[15]) {    //Função para busca dos dados que se encon
 
 // ENDERECO DO OWNER
 void stdReadAddressOwner(struct addressOwner _address) {    //Leitura da struct addressOwner vinda da struct owner
-    printf("----------Endereco do owner----------\n");
+    printf("----------Endereco do proprietario----------\n");
     printf("Logradouro: %s\n", _address.logradouro);
     printf("Bairro: %s\n", _address.bairro);
     printf("CEP: %s\n", _address.CEP);
@@ -286,7 +329,7 @@ void stdReadAddressOwner(struct addressOwner _address) {    //Leitura da struct 
 
 // CASA DO OWNER
 void stdReadOwnerHouseAddress(struct informacao_casa _address) {    //Leitura da struct informação_casa vinda da struct owner
-    printf("\n\n----------Endereco da casa----------\n");
+    printf("----------Endereco da casa----------\n");
     printf("Numero da casa: %d\n", _address.num_casa);
     printf("Status da casa: %c\n", _address.status_casa);
 }
@@ -311,6 +354,9 @@ void stdReadHouse(struct house _house) {    //Leitura dos dados referente a stru
     stdReadHouseAddress(_house.address);   //Função que fará a leitura da struct interna de House.
 }
 
+void readHouseParcial (float area, int quartos, char bairro[20]) {
+
+}
 void readHouses(char op) {  //Função de leitura de Arquivo binário  
     int i;
     struct house _house;
@@ -340,6 +386,86 @@ void readHouses(char op) {  //Função de leitura de Arquivo binário
     system("pause");
 }
 
+void readHouseBairro(char bairro[20]) {
+    int i, j, cont = 0;
+    struct house _house;
+    char bairroCasa[20];
+    for (j = 0; j < strlen(bairro); j++) {
+        bairro[j] = tolower(bairro[j]);
+    }
+    FILE *file = fopen(FILE_NAME, "rb");    //Abertura do Arquivo
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+    else {
+        for (i = 0; i < countHouses(); i++) {
+            fseek(file, i * sizeof(struct house), SEEK_SET);
+            fread(&_house, sizeof(struct house), 1, file);
+            strcpy(bairroCasa, _house.address.bairro);
+            for (j = 0; j < strlen(bairroCasa); j++) {
+                bairroCasa[j] = tolower(bairroCasa[j]);
+            }
+            if ((strcmp(bairroCasa, bairro)) == 0) {
+                stdReadHouse(_house);
+                cont++;
+            }
+        }
+    }
+    fclose(file);   //Fechamento do arquivo
+    if (cont == 0) {
+        printf("\nNao ha nenhuma casa no bairro %s\n", bairro);
+    }
+    system("pause");
+    return;
+}
+void readHouseRoom(int quartos) {
+    int i, j, cont = 0;
+    struct house _house;
+    FILE *file = fopen(FILE_NAME, "rb");    //Abertura do Arquivo
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+    else {
+        for (i = 0; i < countHouses(); i++) {
+            fseek(file, i * sizeof(struct house), SEEK_SET);
+            fread(&_house, sizeof(struct house), 1, file);
+            if (quartos == _house.quartos) {
+                stdReadHouse(_house);
+                cont++;
+            }
+        }
+    }
+    fclose(file);   //Fechamento do arquivo
+    if (cont == 0) {
+        printf("\nNao ha nenhuma casa com %d quartos\n", quartos);
+    }
+    system("pause");
+    return;
+}
+void readHouseArea(float area) {
+    int i, j, cont = 0;
+    struct house _house;
+    FILE *file = fopen(FILE_NAME, "rb");    //Abertura do Arquivo
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+    else {
+        for (i = 0; i < countHouses(); i++) {
+            fseek(file, i * sizeof(struct house), SEEK_SET);
+            fread(&_house, sizeof(struct house), 1, file);
+            if (area == _house.area) {
+                stdReadHouse(_house);
+                cont++;
+            }
+        }
+    }
+    fclose(file);   //Fechamento do arquivo
+    if (cont == 0) {
+        printf("\nNao ha nenhuma casa com %.2fm2\n", area);
+    }
+    system("pause");
+    return;
+}
 // WRITE FUNCTIONS
 int countHouses(){  //Função para a contagem e retorno da quantidade de dados existente no arquivo referente a Houses
     long int cont = 0;
@@ -364,8 +490,7 @@ struct house stdWriteHouse() {     //Função de cadastro básico da struct hous
     scanf("%d", &_house.quartos);
     printf("\nValor da casa: ");
     scanf("%f", &_house.valor);
-    printf("\nRegiao do imovel: ");
-    scanf("%d", &_house.reg_imov);
+    _house.reg_imov = 1 + countHouses(); 
     printf("\n----------Endereco da casa----------\n");
     printf("\nLogradouro: ");
     fflush(stdin);
