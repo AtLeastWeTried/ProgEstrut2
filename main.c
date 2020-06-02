@@ -5,6 +5,7 @@
 
 #define FILE_NAME "house.bin"   //Arquivo contendo os dados da struct House
 #define DIRECTORY "owner.bin"    //Arquivo contendo os dados da struct Owner
+#define FILE_LOCATAERIO "locatario.bin" //Arquivo contendo os dados da struct locatario
 
 // STRUCTS --- STRUCTS --- STRUCTS --- STRUCTS --- STRUCTS //
 
@@ -63,6 +64,24 @@ struct house {
     union data status;
 };
 
+struct date {
+    int day;
+    int month;
+    int year;
+};
+
+struct locatario{
+  int   reg_loc;   // gerado automaticamente
+  char   nome[80];
+  char   CPF[15];
+  struct addressOwner end_loc;
+  int   reg_imov;  // registro imóvel – buscar no arq. Imóvel
+  int   dia_venc;
+  struct date inicio;
+  struct date termino;
+}; 
+
+
 // ESCOPOS FUNÇÕES --- ESCOPOS FUNÇÕES --- ESCOPOS FUNÇÕES --- ESCOPOS FUNÇÕES 
 //OWNER
 int countOwners();  //Contador de dados que existem no arquivo
@@ -86,18 +105,27 @@ void writeHouse (struct house _house);  //Escrita dos dados house no arquivo
 void readHouseBairro(char bairro[20]);
 void readHouseRoom(int quartos);
 void readHouseArea(float area);
+int searchByRegister (int _register);
+struct date inputDate();
+struct locatario stdReadLocatario();
+void stdWriteLocatario(struct locatario _locatario);
+void writeLocatario (struct locatario _locatario);
+void readLocatarios();
+void alterStatusHouse(int pos, char status);
 
 int main() { 
-    int op;
+    int op, want_rent, reg_num, pos;
     char cpf[15], parametro, opc, escolha;
     struct house _house;
     struct owner  _owner;
+    struct locatario _locatario;
     do {
         fflush(stdin);
         system("cls");
-        printf("[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5] Sair\nOpcao: ");
+        printf("[0] Sair\n[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5]Aluguel\n[6]Consulta locatarios\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
+            case 0: printf("Fim do programa"); break;
             case 1: 
                 system("cls");
                 _owner = stdWriteOwner();
@@ -180,10 +208,30 @@ int main() {
                     }
                 }
                 break;
-            case 5: printf("Fim do programa"); break;
+            case 5:
+                system("cls");
+                printf("\n----------Casas Para Aluguel----------\n");
+                readHouses('L');
+                printf("\nRegistro do imovel que deseja alugar: ");
+                scanf("%d", &reg_num);
+                pos = searchByRegister(reg_num);
+                printf("\nPos: %d", pos);
+                if (pos < 0) {
+                    printf("\nRegistro inexistente.");
+                    system("pause");
+                    break;
+                }
+                _locatario = stdReadLocatario();
+                _locatario.reg_imov = pos + 1;
+                writeLocatario(_locatario);
+                break;
+            case 6: 
+                system("cls");
+                readLocatarios();
+                break;
             default: printf("Opcao nao existente"); break;
         }
-    } while (op != 5);
+    } while (op != 0);
     system("cls");
 }
 
@@ -276,7 +324,7 @@ void readOwners() { //Função geral de Leitura dos dados
     struct owner _owner;
     FILE *file = fopen(DIRECTORY, "rb");    //Abertura do arquivo para a leitura
     if (file == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
+        printf("Nenhum proprietario registrado.\n");
     }
     else {
         for (i = 0; i < countOwners(); i++) {
@@ -346,6 +394,7 @@ void stdReadHouseAddress(struct houseAddress _house) { //Leitura dos dados refer
 
 void stdReadHouse(struct house _house) {    //Leitura dos dados referente a struct geral house
     printf("\n----------Casa----------\n");
+    printf("Registro: %d\n", _house.reg_imov);
     printf("Quartos: %d\n", _house.quartos);
     printf("Area(m2): %.2f\n", _house.area);
     printf("Registro da casa: %d\n", _house.reg_imov);
@@ -513,7 +562,7 @@ struct house stdWriteHouse() {     //Função de cadastro básico da struct hous
     return _house;  //Retorna a nova struct
 }
 
-void writeHouse (struct house _house) {  //Escrita dos dados armazenados na Ram para o arquivo house.bin
+void writeHouse (struct house _house) {  //Escrita dos dados armazenados na ROM para o arquivo house.bin
     FILE *file = fopen(FILE_NAME, "ab");
     if (file == NULL) {
         printf("\nErro ao abrir o arquivo!");
@@ -522,4 +571,173 @@ void writeHouse (struct house _house) {  //Escrita dos dados armazenados na Ram 
         fwrite(&_house, sizeof(struct house), 1, file);
     }
     fclose(file);
+}
+
+int searchByRegister(int _register) {
+    struct house _house;
+    FILE *file = fopen(FILE_NAME, "rb");
+    int i;
+    if (file == NULL) {
+        printf("\nNenhuma casa registrada.");
+        fclose(file);
+        return -1;
+    }
+    for (i = 0; i < countHouses(); i++) {
+        fseek(file, i * sizeof(struct house), SEEK_SET);
+        fread(&_house, sizeof(struct house), 1, file);
+        if (_house.reg_imov == _register && _house.status.sigla == 'L') {
+            printf("\nCasa Alugada.");
+            fclose(file);
+            return i;
+        }
+    }
+    fclose(file);
+    return -1;
+}
+
+struct date inputDate() {
+    struct date _date;
+    int day, month, year, months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}, flag = 0;
+    do {
+        flag = 0;
+        printf("no formato DD/MM/YYYY: ");
+        scanf("%d/%d/%d", &day, &month, &year);
+        if (year < 1980 || year > 3000) {
+            printf("\nAno incorreto.\nInforme a data ");
+            flag = 1;
+        }
+        else {
+            if (month < 1 || month > 12) {
+                printf("\nMes incorreto.\nInforme a data ");
+                flag = 1;
+            }
+            else {
+                months[1] = (year % 4 == 0 && (year % 400 == 0 || year % 100 != 0)) ? 29 : 28;
+                if (day < 1 || day > months[month - 1]) {
+                    printf("\nDia incorreto.\nInforme a data ");
+                    flag = 1;
+                }
+            }
+        }
+    } while(flag == 1);
+    _date.day = day;
+    _date.month = month;
+    _date.year = year;
+    return _date;
+}
+
+int countLocatario() {
+    long int count = 0;
+    FILE *fptr = NULL;
+    if((fptr = fopen(FILE_LOCATAERIO, "rb")) == NULL){//Abertura do Arquivo
+        return count;    //Caso ele não ache, o retorno será 0 pois o arquivo não existe ainda;
+    }
+    else{
+        fseek(fptr, 0 , 2);
+        count = ftell(fptr) / sizeof(struct locatario);      //Retorno da quantidade dos dados
+        fclose(fptr);    //Fechamento do arquivo
+        return count;    //Retorna a quantidade calculada de dados existentes.
+    }
+}
+
+
+struct locatario stdReadLocatario() {
+    struct locatario _locatario;
+    printf("\n----------Dados Locatario----------\n");
+    printf("\nNome: ");
+    fflush(stdin);
+    gets(_locatario.nome);
+    printf("\nCPF: ");
+    fflush(stdin);
+    gets(_locatario.CPF);
+    printf("\n----------Endereco Locatario----------\n");
+    printf("\nEstado: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.estado);
+    printf("\nCidade: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.cidade);
+    printf("\nBairro: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.bairro);
+    printf("\nLogradouro: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.logradouro);
+    printf("\nCEP: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.CEP);
+    printf("\nTelefone: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.fone);
+    printf("\nCelular: ");
+    fflush(stdin);
+    gets(_locatario.end_loc.cel);
+    printf("\nData inicial do contrato "); 
+    _locatario.inicio = inputDate();
+    printf("\nData final do contrato "); 
+    _locatario.termino = inputDate();
+    return _locatario;
+}
+
+void stdWriteLocatario(struct locatario _locatario) {
+    printf("\n----------Dados Locatario----------\n");
+    printf("\nRegistro de Locatario: %d", _locatario.reg_loc);
+    printf("\nNome: %s", _locatario.nome);
+    printf("\nCPF: %s", _locatario.CPF);
+    printf("\nRegistro de Imovel: %d", _locatario.reg_imov);
+    printf("\nData inicial do contrato: %d/%d/%d", _locatario.inicio.day, _locatario.inicio.month, _locatario.inicio.year);
+    printf("\nData final do contrato: %d/%d/%d\n", _locatario.termino.day, _locatario.termino.month, _locatario.termino.year);
+}
+
+void writeLocatario (struct locatario _locatario) {  //Escrita dos dados armazenados na ROM para o arquivo locatario.bin
+    _locatario.reg_loc = countLocatario();
+    FILE *file = fopen(FILE_LOCATAERIO, "ab");
+    if (file == NULL) {
+        printf("\nErro ao abrir o arquivo!");
+    }
+    else {
+        fwrite(&_locatario, sizeof(struct locatario), 1, file);
+    }
+    fclose(file);
+}
+
+void readLocatarios() { //Função geral de Leitura dos dados
+    int i;
+    struct locatario _locatario;
+    FILE *file = fopen(FILE_LOCATAERIO, "rb");    //Abertura do arquivo para a leitura
+    if (file == NULL) {
+        printf("Nenhum locataario registrado.\n");
+    }
+    else {
+        printf("\nCountLocatario: %d\n", countLocatario());
+        for (i = 0; i < countLocatario(); i++) {
+            fseek(file, i * sizeof(struct locatario), SEEK_SET);
+            fread(&_locatario, sizeof(struct locatario), 1, file);
+            stdWriteLocatario(_locatario); 
+        }
+    fclose(file);   //Fechamento do arquivo
+    }
+    system("pause");
+}
+
+void alterStatusHouse(int pos, char status) { 
+    long int tam;
+    struct house old;
+    FILE *file = fopen(FILE_NAME, "ab");
+    void *copia = NULL;
+    if (file == NULL) {
+        printf("\nErro ao abrir o arquivo.");
+    }
+    else {
+        //tentei
+        // fseek(file, pos * sizeof(struct locatario), SEEK_SET);
+        // fread(&old, sizeof(struct house), 1, file);
+        // old.status.sigla = status;
+        // fseek(file, sizeof(struct locatario), SEEK_CUR);
+        // tam = ftell(file) / sizeof(struct house);
+        // copia = malloc(tam);
+        // fread(copia, tam, sizeof(struct house), file);
+        // printf("copia: %s", copia);
+        // printf("tam: %d sizeof: %d", tam, sizeof(struct house));
+    }
 }
