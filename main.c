@@ -113,6 +113,9 @@ void stdWriteLocatario(struct locatario _locatario);
 void writeLocatario (struct locatario _locatario);
 void readLocatarios();
 void alterStatusHouse(int reg);
+void endContract(struct locatario _locatario);
+struct locatario searchLocatariobyCPF(char cpf[15]);
+int cmpDate(struct date _date1, struct date _date2);
 
 int main() { 
     int op, want_rent, reg_num, pos, reg;
@@ -360,6 +363,30 @@ void searchByCPF(char cpf[15]) {    //Função para busca dos dados que se encon
                     fclose(file);
                     stdReadOwner(_owner);//Leitura da struct achada
                     return;
+                }
+            }
+        }
+        fclose(file);
+    }
+    printf("\nNenhum proprietario encontrado com este cpf\n");
+}
+
+struct locatario searchLocatariobyCPF(char cpf[15]) {
+    int i, j, cmp;
+    struct locatario _locatario;
+    FILE *file = fopen(FILE_LOCATAERIO, "rb");    //Abertura do arquivo para leitura
+    if (file == NULL) {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+    else {
+        for (i = 0; i < countLocatario(); i++) {
+            fseek(file, i * sizeof(struct locatario), SEEK_SET);
+            fread(&_locatario, sizeof(struct locatario), 1, file);
+            for (j = 0; j <= 15; j++) {
+                cmp = strcmp(_locatario.CPF, cpf);  //Comparação com o cpf passado com o atual dado pelo read
+                if (cmp == 0) {    //Parametro que limita a leitura dos dados. 
+                    fclose(file);
+                    return _locatario;
                 }
             }
         }
@@ -756,4 +783,29 @@ void alterStatusHouse(int reg) {
     scanf("%c", &aux);
     _house.status.sigla = aux;
     writeHouse(_house);
+}
+
+int cmpDate(struct date _date1, struct date _date2) {
+    if (_date2.year > _date1.year) {
+        return 0;
+    }
+    else if (_date2.month > _date1.month) {
+        return 0;
+    }
+    else if (_date2.day > _date1.day) {
+        return 0;
+    }
+    return 1;
+}
+
+void endContract(struct locatario _locatario) {
+    struct date _date;
+    stdReadLocatario(_locatario);
+    printf("\nInforme a data atual: ");
+    _date = inputDate();
+    if (cmpDate(_date, _locatario.termino)) {
+        printf("\nMulta: Valor do aluguel");
+    }
+    //_locatario.CPF = "@";
+    
 }
