@@ -70,7 +70,7 @@ struct date {
     int year;
 };
 
-struct locatario{
+struct locatario {
   int   reg_loc;   // gerado automaticamente
   char   nome[80];
   char   CPF[15];
@@ -101,6 +101,7 @@ void stdReadHouse(struct house _house);     //Mostra dos dados referente a struc
 void readHouses(char op);   //Função da leitura dos dados adquiridos dentro do arquivo
 int countHouses();  //Contador de quantos dados existem dentro do arquivo
 struct house stdWriteHouse();   //Cadastro dos dados referente a struct House   
+struct house searchHouseByRegister(int _register);
 void writeHouse (struct house _house);  //Escrita dos dados house no arquivo
 void readHouseBairro(char bairro[20]);
 void readHouseRoom(int quartos);
@@ -111,10 +112,10 @@ struct locatario stdReadLocatario();
 void stdWriteLocatario(struct locatario _locatario);
 void writeLocatario (struct locatario _locatario);
 void readLocatarios();
-void alterStatusHouse(int pos, char status);
+void alterStatusHouse(int reg);
 
 int main() { 
-    int op, want_rent, reg_num, pos;
+    int op, want_rent, reg_num, pos, reg;
     char cpf[15], parametro, opc, escolha;
     struct house _house;
     struct owner  _owner;
@@ -122,7 +123,7 @@ int main() {
     do {
         fflush(stdin);
         system("cls");
-        printf("[0] Sair\n[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5]Aluguel\n[6]Consulta locatarios\nOpcao: ");
+        printf("[0] Sair\n[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5] Aluguel\n[6] Consulta locatarios\n[7] Alterar sigla\nOpcao: ");
         scanf("%d", &op);
         switch(op) {
             case 0: printf("Fim do programa"); break;
@@ -228,6 +229,11 @@ int main() {
             case 6: 
                 system("cls");
                 readLocatarios();
+                break;
+            case 7:
+                printf("\nRegistro da casa a alterar: ");
+                scanf("%d", &reg);
+                alterStatusHouse(reg);
                 break;
             default: printf("Opcao nao existente"); break;
         }
@@ -595,6 +601,26 @@ int searchByRegister(int _register) {
     return -1;
 }
 
+struct house searchHouseByRegister(int _register) {
+    struct house _house;
+    FILE *file = fopen(FILE_NAME, "rb");
+    int i;
+    if (file == NULL) {
+        printf("\nNenhuma casa registrada.");
+        fclose(file);
+        return;
+    }
+    for (i = 0; i < countHouses(); i++) {
+        fseek(file, i * sizeof(struct house), SEEK_SET);
+        fread(&_house, sizeof(struct house), 1, file);
+        if (_house.reg_imov == _register) {
+            fclose(file);
+            return _house;
+        }
+    }
+    fclose(file);
+}
+
 struct date inputDate() {
     struct date _date;
     int day, month, year, months[12] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31}, flag = 0;
@@ -720,24 +746,14 @@ void readLocatarios() { //Função geral de Leitura dos dados
     system("pause");
 }
 
-void alterStatusHouse(int pos, char status) { 
-    long int tam;
-    struct house old;
-    FILE *file = fopen(FILE_NAME, "ab");
-    void *copia = NULL;
-    if (file == NULL) {
-        printf("\nErro ao abrir o arquivo.");
-    }
-    else {
-        //tentei
-        // fseek(file, pos * sizeof(struct locatario), SEEK_SET);
-        // fread(&old, sizeof(struct house), 1, file);
-        // old.status.sigla = status;
-        // fseek(file, sizeof(struct locatario), SEEK_CUR);
-        // tam = ftell(file) / sizeof(struct house);
-        // copia = malloc(tam);
-        // fread(copia, tam, sizeof(struct house), file);
-        // printf("copia: %s", copia);
-        // printf("tam: %d sizeof: %d", tam, sizeof(struct house));
-    }
+void alterStatusHouse(int reg) { 
+    struct house _house;
+    char aux;
+    _house = searchHouseByRegister(reg);
+    printf("\nStatus atual: %c", _house.status.sigla);
+    printf("\nStatus novo: ");
+    fflush(stdin);
+    scanf("%c", &aux);
+    _house.status.sigla = aux;
+    writeHouse(_house);
 }
