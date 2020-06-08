@@ -1243,15 +1243,12 @@ struct locatario search_locatario(char cpf[15])
         {
             fseek(file, i * sizeof(struct locatario), SEEK_SET);
             fread(&_locatario, sizeof(struct locatario), 1, file);
-            for (j = 0; j <= 15; j++)
-            {
-                cmp = strcmp(_locatario.CPF, cpf); //Comparação com o cpf passado com o atual dado pelo read
-                if (cmp == 0)
-                { //Parametro que limita a leitura dos dados.
-                    fclose(file);
-                    stdWriteLocatarior(_locatario); //Leitura da struct achada
-                    return _locatario;
-                }
+            cmp = strcmp(_locatario.CPF, cpf); //Comparação com o cpf passado com o atual dado pelo read
+            if (cmp == 0)
+            { //Parametro que limita a leitura dos dados.
+                fclose(file);
+                stdWriteLocatarior(_locatario); //Leitura da struct achada
+                return _locatario;
             }
         }
         fclose(file);
