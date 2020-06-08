@@ -94,7 +94,7 @@ void readOwners();  //Leitura dos dados contidos no arquivo referente ao owner
 void searchByCPF(char cpf[15]); //Função para busca com filtro referente ao CPF
 void stdReadAddressOwner(struct addressOwner _address); //Mostra dos dados da struct addressOwner
 void stdReadOwnerHouseAddress(struct informacao_casa _address); //Mostra dos dados da struct informacao_casa
-int searchCPF_owner(char cpf[15])
+int searchCPF_owner(char cpf[15]);
 
 //HOUSE
 void stdReadHouseAddress(struct houseAddress _house);   //Mostra dos dados referente a struct houseAddress
@@ -121,6 +121,9 @@ int cmpDate(struct date _date1, struct date _date2);
 int altera_locatario(int pos);
 int altera_house(int pos);
 int altera_owner(int pos);
+int searchREG_house(int reg);
+int searchCPF_locatario(char cpf[15]);
+int countLocatario();
 
 int main(){ 
     int op, want_rent, reg_num, pos, reg, opcao8, check;
@@ -251,11 +254,11 @@ int main(){
             	scanf("%d",&opcao8);
             	switch(opcao8){
             		case 1:
-            			printf("Digite o CPF do proprietario")
+            			printf("Digite o CPF do proprietario");
             			fflush(stdin);
             			gets(cpf);
-            			check = searchCPF(cpf);
-            			check = altera_owner(check)
+            			check = searchCPF_owner(cpf);
+            			check = altera_owner(check);
             			if(check == 1){
             				printf("\n\nLeitura dos dados finalizados.");
             				readOwners();
@@ -263,25 +266,25 @@ int main(){
             			break;
     
             		case 2:
-            			printf("Digite numero de registro do imovel")
+            			printf("Digite numero de registro do imovel");
             			fflush(stdin);
-            			gets(reg);
+            			scanf("%d", &reg);
             			check = searchREG_house(check);
-            			check = altera_house(check)
+            			check = altera_house(check);
             			if(check == 1){
             				printf("\n\nLeitura dos dados finalizados.");
-            				readHouses();
+            				// readHouses();
 						}
             			break;
             		case 3:
-            			printf("Digite numero de CPF do locatario")
+            			printf("Digite numero de CPF do locatario");
             			fflush(stdin);
             			gets(cpf);
             			check = searchCPF_locatario(cpf);
-            			check = altera_locatario(check)
+            			check = altera_locatario(check);
             			if(check == 1){
             				printf("\n\nLeitura dos dados finalizados.");
-            				WriteLocatario();
+            				readLocatarios();
 						}
             			
             			break;
@@ -333,64 +336,64 @@ struct addressOwner stdWriteAddressOwner() {    //Função de cadastro básico r
 
 int altera_owner(int pos)
 {
-int valida = 0;
-struct owner _owner;
-FILE *fptr = NULL;
+    int valida = 0;
+    struct owner _owner;
+    FILE *fptr = NULL;
 
-printf("\nRegistro inexistente\n\n");
+    printf("\nRegistro inexistente\n\n");
 
-printf("Inicio da altarecao")
-  
-printf("\nEm seguida digite os novos dados a serem alterados");
-_owner = stdWriteOwner();
-	
-if((fptr = fopen("owner.bin", "rb+")) == NULL){
-	system("cls");
-	printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-	valida = 0;
-	return valida;
-}
-else{
-	fseek(fptr, pos*sizeof(struct owner), 1);
-	fwrite(_owner, sizeof(struct owner), 1 , fptr);
-	valida = 1;
-}
-fclose(fptr);
+    printf("Inicio da altarecao");
+    
+    printf("\nEm seguida digite os novos dados a serem alterados");
+    _owner = stdWriteOwner();
+        
+    if((fptr = fopen("owner.bin", "rb+")) == NULL){
+        system("cls");
+        printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
+        valida = 0;
+        return valida;
+    }
+    else{
+        fseek(fptr, pos*sizeof(struct owner), 1);
+        fwrite(&_owner, sizeof(struct owner), 1 , fptr);
+        valida = 1;
+    }
+    fclose(fptr);
 
-printf("\nRegistro alterado com sucesso\n\n");
-return valida;
-  
+    printf("\nRegistro alterado com sucesso\n\n");
+    return valida;
+    
 }//altera
 
 int altera_house(int pos)
 {
-int valida = 0;
-struct house _house;
-FILE *fptr = NULL;
+    int valida = 0;
+    struct house _house;
+    FILE *fptr = NULL;
 
-printf("\nRegistro inexistente\n\n");
+    printf("\nRegistro inexistente\n\n");
 
-printf("Inicio da altarecao")
-  
-printf("\nEm seguida digite os novos dados a serem alterados");
-_house = stdWriteHouse();
-	
-if((fptr = fopen("house.bin", "rb+")) == NULL){
-	system("cls");
-	printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-	valida = 0;
-	return valida;
-}
-else{
-	fseek(fptr, pos*sizeof(struct house), 1);
-	fwrite(_house, sizeof(struct house), 1 , fptr);
-	valida = 1;
-}
-fclose(fptr);
+    printf("Inicio da altarecao");
+    
+    printf("\nEm seguida digite os novos dados a serem alterados");
+    _house = stdWriteHouse();
+        
+    if((fptr = fopen("house.bin", "rb+")) == NULL){
+        system("cls");
+        printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
+        valida = 0;
+        return valida;
+    }
+    else{
+        fseek(fptr, pos*sizeof(struct house), 1);
+        fwrite(&_house, sizeof(struct house), 1 , fptr);
+        valida = 1;
+    }
+    fclose(fptr);
 
-printf("\nRegistro alterado com sucesso\n\n");
-return valida;
-  
+    printf("\nRegistro alterado com sucesso\n\n");
+    return valida;
+    
 }//altera
 
 int altera_locatario(int pos)
@@ -401,10 +404,10 @@ FILE *fptr = NULL;
 
 printf("\nRegistro inexistente\n\n");
 
-printf("Inicio da altarecao")
+printf("Inicio da altarecao");
   
 printf("\nEm seguida digite os novos dados a serem alterados");
-_locatario = stdReadLocatario()
+_locatario = stdReadLocatario();
 	
 if((fptr = fopen("locatario.bin", "rb+")) == NULL){
 	system("cls");
@@ -414,7 +417,7 @@ if((fptr = fopen("locatario.bin", "rb+")) == NULL){
 }
 else{
 	fseek(fptr, pos*sizeof(struct locatario), 1);
-	fwrite(_locatario sizeof(struct locatario), 1 , fptr);
+	fwrite(&_locatario, sizeof(struct locatario), 1 , fptr);
 	valida = 1;
 }
 fclose(fptr);
@@ -575,12 +578,12 @@ int searchCPF_locatario(char cpf[15]){    //Função para busca dos dados que se
     else {
         for (i = 0; i < countOwners(); i++) {
             fseek(file, i * sizeof(struct locatario), SEEK_SET);
-            fread(&_owner, sizeof(struct locatario), 1, file);
+            fread(&_locatario, sizeof(struct locatario), 1, file);
             for (j = 0; j <= 15; j++) {
                 cmp = strcmp(_locatario.CPF, cpf);  //Comparação com o cpf passado com o atual dado pelo read
                 if (cmp == 0) {    //Parametro que limita a leitura dos dados. 
                     fclose(file);
-                    stdWriteLocatarior(_locatario);//Leitura da struct achada
+                    stdWriteLocatario(_locatario);//Leitura da struct achada
                     return i;
                 }
             }
@@ -855,14 +858,15 @@ struct house searchHouseByRegister(int _register) {
     if (file == NULL) {
         printf("\nNenhuma casa registrada.");
         fclose(file);
-        return;
     }
-    for (i = 0; i < countHouses(); i++) {
-        fseek(file, i * sizeof(struct house), SEEK_SET);
-        fread(&_house, sizeof(struct house), 1, file);
-        if (_house.reg_imov == _register) {
-            fclose(file);
-            return _house;
+    else {
+        for (i = 0; i < countHouses(); i++) {
+            fseek(file, i * sizeof(struct house), SEEK_SET);
+            fread(&_house, sizeof(struct house), 1, file);
+            if (_house.reg_imov == _register) {
+                fclose(file);
+                return _house;
+            }
         }
     }
     fclose(file);
@@ -1029,33 +1033,6 @@ void endContract(struct locatario _locatario) {
     //_locatario.CPF = "@";
     
 }
-//============================Altera��o 08/06
-
-int searchCPF_owner(char cpf[15]){    //Função para busca dos dados que se encontram com o CPF requerido
-    int i, j, cmp;
-    struct owner _owner;
-    FILE *file = fopen(DIRECTORY, "rb");    //Abertura do arquivo para leitura
-    if (file == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
-    }
-    else {
-        for (i = 0; i < countOwners(); i++) {
-            fseek(file, i * sizeof(struct owner), SEEK_SET);
-            fread(&_owner, sizeof(struct owner), 1, file);
-            for (j = 0; j <= 15; j++) {
-                cmp = strcmp(_owner.CPF, cpf);  //Comparação com o cpf passado com o atual dado pelo read
-                if (cmp == 0) {    //Parametro que limita a leitura dos dados. 
-                    fclose(file);
-                    stdReadOwner(_owner);//Leitura da struct achada
-                    return i;
-                }
-            }
-        }
-        fclose(file);
-    }
-    return -1;
-    printf("\nNenhum proprietario encontrado com este cpf\n");
-}
 
 int searchCPF_house(int reg){    //Função para busca dos dados que se encontram com o reg requerido
     int i, j;
@@ -1082,124 +1059,7 @@ int searchCPF_house(int reg){    //Função para busca dos dados que se encontra
     return -1;
     printf("\nNenhum proprietario encontrado com este registro\n");
 }
-int searchCPF_locatario(char cpf[15]){    //Função para busca dos dados que se encontram com o CPF requerido
-    int i, j, cmp;
-    struct locatario _locatario;
-    FILE *file = fopen(DIRECTORY, "rb");    //Abertura do arquivo para leitura
-    if (file == NULL) {
-        printf("Erro ao abrir o arquivo!\n");
-    }
-    else {
-        for (i = 0; i < countOwners(); i++) {
-            fseek(file, i * sizeof(struct locatario), SEEK_SET);
-            fread(&_owner, sizeof(struct locatario), 1, file);
-            for (j = 0; j <= 15; j++) {
-                cmp = strcmp(_locatario.CPF, cpf);  //Comparação com o cpf passado com o atual dado pelo read
-                if (cmp == 0) {    //Parametro que limita a leitura dos dados. 
-                    fclose(file);
-                    stdWriteLocatarior(_locatario);//Leitura da struct achada
-                    return i;
-                }
-            }
-        }
-        fclose(file);
-    }
-    return -1;
-    printf("\nNenhum proprietario encontrado com este cpf\n");
 
-
-
-int altera_owner(int pos)
-{
-int valida = 0;
-struct owner _owner;
-FILE *fptr = NULL;
-
-printf("\nRegistro inexistente\n\n");
-
-printf("Inicio da altarecao")
-  
-printf("\nEm seguida digite os novos dados a serem alterados");
-_owner = stdWriteOwner();
-	
-if((fptr = fopen("owner.bin", "rb+")) == NULL){
-	system("cls");
-	printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-	valida = 0;
-	return valida;
-}
-else{
-	fseek(fptr, pos*sizeof(struct owner), 1);
-	fwrite(_owner, sizeof(struct owner), 1 , fptr);
-	valida = 1;
-}
-fclose(fptr);
-
-printf("\nRegistro alterado com sucesso\n\n");
-return valida;
-  
-}//altera
-
-int altera_house(int pos)
-{
-int valida = 0;
-struct house _house;
-FILE *fptr = NULL;
-
-printf("\nRegistro inexistente\n\n");
-
-printf("Inicio da altarecao")
-  
-printf("\nEm seguida digite os novos dados a serem alterados");
-_house = stdWriteHouse();
-	
-if((fptr = fopen("house.bin", "rb+")) == NULL){
-	system("cls");
-	printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-	valida = 0;
-	return valida;
-}
-else{
-	fseek(fptr, pos*sizeof(struct house), 1);
-	fwrite(_house, sizeof(struct house), 1 , fptr);
-	valida = 1;
-}
-fclose(fptr);
-
-printf("\nRegistro alterado com sucesso\n\n");
-return valida;
-  
-}//altera
-
-int altera_locatario(int pos)
-{
-int valida = 0;
-struct locatario _locatario;
-FILE *fptr = NULL;
-
-printf("\nRegistro inexistente\n\n");
-
-printf("Inicio da altarecao")
-  
-printf("\nEm seguida digite os novos dados a serem alterados");
-_owner = stdReadLocatario()
-	
-if((fptr = fopen("locatario.bin", "rb+")) == NULL){
-	system("cls");
-	printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-	valida = 0;
-	return valida;
-}
-else{
-	fseek(fptr, pos*sizeof(struct locatario), 1);
-	fwrite(_locatario sizeof(struct locatario), 1 , fptr);
-	valida = 1;
-}
-fclose(fptr);
-
-printf("\nRegistro alterado com sucesso\n\n");
-return valida;
-  
 
 
 
