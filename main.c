@@ -132,6 +132,7 @@ int searchREG_house(int reg);
 int searchCPF_locatario(char cpf[15]);
 int countLocatario();
 struct locatario search_locatario(char cpf[15]);
+int deleta_locatario(struct locatario _locatario);
 
 int main()
 {
@@ -286,6 +287,8 @@ int main()
             stdWriteLocatario(_locatario);
             printf("\nDigite o ano atual: ");
             scanf("%d", &dat);
+
+            deleta_locatario(_locatario);
             
             
             if (dat > _locatario.termino.year)
@@ -397,6 +400,7 @@ struct addressOwner stdWriteAddressOwner()
     return _address; //Retorna a nova struct.
 }
 
+
 int altera_owner(int pos)
 {
     int valida = 0;
@@ -492,6 +496,35 @@ int altera_locatario(int pos)
     fclose(fptr);
 
     printf("\nRegistro alterado com sucesso\n\n");
+    return valida;
+
+} //altera
+
+int deleta_locatario(struct locatario _locatario)
+{
+    int valida = 0;
+    FILE *fptr = NULL;
+
+    printf("\nRegistro inexistente\n\n");
+
+    printf("Inicio da altarecao");
+    _locatario.CPF = "@";
+    if ((fptr = fopen("locatario.bin", "rb+")) == NULL)
+    {
+        system("cls");
+        printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
+        valida = 0;
+        return valida;
+    }
+    else
+    {
+        fseek(fptr, _locatario.reg_loc * sizeof(struct locatario), 1);
+        fwrite(&_locatario, sizeof(struct locatario), 1, fptr);
+        valida = 1;
+    }
+    fclose(fptr);
+
+    printf("\nRegistro Deletado com sucesso com sucesso\n\n");
     return valida;
 
 } //altera
