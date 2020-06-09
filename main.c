@@ -102,6 +102,7 @@ void searchByCPF(char cpf[15]);                                 //Função para 
 void stdReadAddressOwner(struct addressOwner _address);         //Mostra dos dados da struct addressOwner
 void stdReadOwnerHouseAddress(struct informacao_casa _address); //Mostra dos dados da struct informacao_casa
 int searchCPF_owner(char cpf[15]);
+void altera_sigla_owner(int pos)
 
 //HOUSE
 void stdReadHouseAddress(struct houseAddress _house); //Mostra dos dados referente a struct houseAddress
@@ -124,6 +125,9 @@ void alterStatusHouse(int reg);
 void endContract(struct locatario _locatario);
 struct locatario searchLocatariobyCPF(char cpf[15]);
 int cmpDate(struct date _date1, struct date _date2);
+void altera_sigla_house(int pos);
+
+
 
 int altera_locatario(int pos);
 int altera_house(int pos);
@@ -289,7 +293,7 @@ int main()
             scanf("%d", &dat);
 
             deleta_locatario(_locatario);
-            
+            searchCPF_owner(_locatario.CPF);
             
             if (dat > _locatario.termino.year)
             {
@@ -399,6 +403,55 @@ struct addressOwner stdWriteAddressOwner()
     gets(_address.email);
     return _address; //Retorna a nova struct.
 }
+
+void altera_sigla_owner(int pos){
+    FILE *fptr = NULL;
+    struct owner _owner;
+    if ((fptr = fopen("owner.bin", "rb+")) == NULL)
+    {
+        system("cls");
+        printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
+        valida = 0;
+        return valida;
+    }
+    else
+    {
+        fseek(fptr, pos * sizeof(struct owner), 1);
+        if(_owner.sCasa.status_casa == 'L'){
+            _owner.sCasa.status_casa  = 'A';
+        }
+        else{
+            _owner.sCasa.status_casa  = 'L';
+        }
+        fwrite(&_owner, sizeof(struct owner), 1, fptr);
+        valida = 1;
+    }
+}
+
+void altera_sigla_house(int pos){
+    FILE *fptr = NULL;
+    struct house _house;
+    if ((fptr = fopen("house.bin", "rb+")) == NULL)
+    {
+        system("cls");
+        printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
+        valida = 0;
+        return valida;
+    }
+    else
+    {
+        fseek(fptr, pos * sizeof(struct house), 1);
+        if(_house.status == 'L'){
+            _house.status  = 'A';
+        }
+        else{
+            _house.status  = 'L';
+        }
+        fwrite(&_house, sizeof(struct house), 1, fptr);
+        valida = 1;
+    }
+}
+
 
 
 int altera_owner(int pos)
