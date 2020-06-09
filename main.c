@@ -102,7 +102,7 @@ void searchByCPF(char cpf[15]);                                 //Função para 
 void stdReadAddressOwner(struct addressOwner _address);         //Mostra dos dados da struct addressOwner
 void stdReadOwnerHouseAddress(struct informacao_casa _address); //Mostra dos dados da struct informacao_casa
 int searchCPF_owner(char cpf[15]);
-void altera_sigla_owner(int pos)
+void altera_sigla_owner(int pos);
 
 //HOUSE
 void stdReadHouseAddress(struct houseAddress _house); //Mostra dos dados referente a struct houseAddress
@@ -411,8 +411,6 @@ void altera_sigla_owner(int pos){
     {
         system("cls");
         printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-        valida = 0;
-        return valida;
     }
     else
     {
@@ -424,7 +422,6 @@ void altera_sigla_owner(int pos){
             _owner.sCasa.status_casa  = 'L';
         }
         fwrite(&_owner, sizeof(struct owner), 1, fptr);
-        valida = 1;
     }
 }
 
@@ -435,20 +432,17 @@ void altera_sigla_house(int pos){
     {
         system("cls");
         printf("\nERRO AO TENTAR ABRIR O ARQUIVO NA ALTERACAO");
-        valida = 0;
-        return valida;
     }
     else
     {
         fseek(fptr, pos * sizeof(struct house), 1);
-        if(_house.status == 'L'){
-            _house.status  = 'A';
+        if(_house.status.sigla == 'L'){
+            _house.status.sigla  = 'A';
         }
         else{
-            _house.status  = 'L';
+            _house.status.sigla  = 'L';
         }
         fwrite(&_house, sizeof(struct house), 1, fptr);
-        valida = 1;
     }
 }
 
@@ -561,7 +555,7 @@ int deleta_locatario(struct locatario _locatario)
     printf("\nRegistro inexistente\n\n");
 
     printf("Inicio da altarecao");
-    _locatario.CPF = "@";
+    _locatario.CPF[0] = '@';
     if ((fptr = fopen("locatario.bin", "rb+")) == NULL)
     {
         system("cls");
@@ -1333,12 +1327,11 @@ struct locatario search_locatario(char cpf[15])
             if (cmp == 0)
             { //Parametro que limita a leitura dos dados.
                 fclose(file);
-                stdWriteLocatarior(_locatario); //Leitura da struct achada
+                stdWriteLocatario(_locatario); //Leitura da struct achada
                 return _locatario;
             }
         }
         fclose(file);
     }
-    return;
     printf("\nNenhum proprietario encontrado com este cpf\n");
 }
