@@ -137,6 +137,9 @@ int searchCPF_locatario(char cpf[15]);
 int countLocatario();
 struct locatario search_locatario(char cpf[15]);
 int deleta_locatario(struct locatario _locatario);
+int compare_date(struct date _date1, struct date _date2);
+struct owner searchOwnerByRegister(int _register);
+void makeReport(struct date _date);
 
 int main()
 {
@@ -145,11 +148,12 @@ int main()
     struct house _house;
     struct owner _owner;
     struct locatario _locatario;
+    struct date _date;
     do
     {
         fflush(stdin);
         system("cls");
-        printf("[0] Sair\n[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5] Aluguel\n[6] Consulta locatarios\n[7] Alterar sigla\n[8]Termino do contrato\n[9]Alteracao de cadastros\nOpcao: ");
+        printf("[0] Sair\n[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5] Aluguel\n[6] Consulta locatarios\n[7] Alterar sigla\n[8]Termino do contrato\n[9]Alteracao de cadastros\n[10]Relatorio\nOpcao: ");
         scanf("%d", &op);
         switch (op)
         {
@@ -353,6 +357,11 @@ int main()
 
                 break;
             }
+            break;
+        case 10:
+            _date = inputDate();
+            makeReport(_date);
+            system("pause");
             break;
         default:
             printf("Opcao nao existente");
@@ -1093,6 +1102,32 @@ struct house searchHouseByRegister(int _register)
     fclose(file);
 }
 
+struct owner searchOwnerByRegister(int _register)
+{
+    struct owner _owner;
+    FILE *file = fopen(DIRECTORY, "rb");
+    int i;
+    if (file == NULL)
+    {
+        printf("\nNenhuma casa registrada.");
+        fclose(file);
+    }
+    else
+    {
+        for (i = 0; i < countHouses(); i++)
+        {
+            fseek(file, i * sizeof(struct house), SEEK_SET);
+            fread(&_owner, sizeof(struct house), 1, file);
+            if (_owner.reg_prop == _register)
+            {
+                fclose(file);
+                return _owner;
+            }
+        }
+    }
+    fclose(file);
+}
+
 struct date inputDate()
 {
     struct date _date;
@@ -1310,7 +1345,7 @@ int searchCPF_house(int reg)
 
 struct locatario search_locatario(char cpf[15])
 {
-    int i, j, cmp;
+    int i, cmp;
     struct locatario _locatario;
     FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
     if (file == NULL)
@@ -1333,5 +1368,38 @@ struct locatario search_locatario(char cpf[15])
         }
         fclose(file);
     }
-    printf("\nNenhum proprietario encontrado com este cpf\n");
+}
+
+void makeReport(struct date _date) {
+    int i, cmp;
+    struct locatario _locatario;
+    FILE *file = fopen(FILE_LOCATAERIO, "rb"); //Abertura do arquivo para leitura
+    if (file == NULL)
+    {
+        printf("Erro ao abrir o arquivo!\n");
+    }
+    else
+    {
+        for (i = 0; i < countLocatario(); i++)
+        {
+            fseek(file, i * sizeof(struct locatario), SEEK_SET);
+            fread(&_locatario, sizeof(struct locatario), 1, file);
+            if (compare_date(_date, _locatario.termino) == 0) {
+                struct house _house = searchHouseByRegister(_locatario.reg_imov);
+                printf("\nValor: %.2f", _house.valor);
+                printf("\nRegistro da casa: %d", _house.reg_imov);
+                printf("\nNome do locatario: %s", _locatario.nome);
+            }
+        }
+        fclose(file);
+    }
+}
+
+int compare_date(struct date _date1, struct date _date2) {
+    if (_date1.day == _date2.day && _date1.month == _date2.month && _date1.year == _date2.year){
+        return 0;
+    }
+    else {
+        return 1;
+    }
 }
