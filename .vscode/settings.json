@@ -1,5 +1,7 @@
 {
     "files.associations": {
         "stdio.h": "c"
-    }
+    },
+    "editor.tabSize": 2,
+    "editor.autoIndent": "advanced"
 }
