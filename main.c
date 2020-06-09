@@ -3,9 +3,9 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#define FILE_NAME "house.bin"           //Arquivo contendo os dados da struct House
-#define DIRECTORY "owner.bin"           //Arquivo contendo os dados da struct Owner
-#define FILE_LOCATAERIO "locatario.bin" //Arquivo contendo os dados da struct locatario
+#define FILE_NAME       "imovel.bin"        // Arquivo contendo os dados da struct House
+#define DIRECTORY       "proprietario.bin"  // Arquivo contendo os dados da struct Owner
+#define FILE_LOCATAERIO "locatario.bin"     // Arquivo contendo os dados da struct locatario
 
 // STRUCTS --- STRUCTS --- STRUCTS --- STRUCTS --- STRUCTS //
 
