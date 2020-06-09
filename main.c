@@ -652,6 +652,7 @@ void readOwners()
         {
             fseek(file, i * sizeof(struct owner), SEEK_SET);
             fread(&_owner, sizeof(struct owner), 1, file);
+            if(_owner.CPF != "@")
             stdReadOwner(_owner); //Função de leitura da struct adquirida.
         }
         fclose(file); //Fechamento do arquivo
@@ -866,7 +867,7 @@ void readHouses(char op)
                 fseek(file, i * sizeof(struct house), SEEK_SET);
                 fread(&_house, sizeof(struct house), 1, file);
                 if (_house.status.sigla == 'L') //Parâmetro para exibição de dados contendo sigla == L
-                    stdReadHouse(_house);
+					stdReadHouse(_house);
             }
         }
         else
@@ -1264,6 +1265,7 @@ void readLocatarios()
         {
             fseek(file, i * sizeof(struct locatario), SEEK_SET);
             fread(&_locatario, sizeof(struct locatario), 1, file);
+            if(_locatario.CPF != "@")
             stdWriteLocatario(_locatario);
         }
         fclose(file); //Fechamento do arquivo
