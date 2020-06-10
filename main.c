@@ -7,8 +7,7 @@
 #define DIRECTORY       "proprietario.bin"  // Arquivo contendo os dados da struct Owner
 #define FILE_LOCATAERIO "locatario.bin"     // Arquivo contendo os dados da struct locatario
 
-struct addressOwner
-{
+struct addressOwner {
 	char logradouro[80];
 	char bairro[20];
 	char CEP[10];
@@ -19,14 +18,12 @@ struct addressOwner
 	char email[30];
 };
 
-struct informacao_casa
-{
+struct informacao_casa {
 	int num_casa;
 	char status_casa;
 };
 
-struct owner
-{
+struct owner {
 	int reg_prop;
 	char nome[80];
 	char CPF[15];
@@ -35,8 +32,7 @@ struct owner
 	struct informacao_casa sCasa;
 };
 
-struct info_loc
-{
+struct info_loc {
 	int reg_loc;
 };
 
@@ -45,16 +41,14 @@ union data {
 	struct info_loc loc;
 };
 
-struct houseAddress
-{
+struct houseAddress {
 	char logradouro[80];
 	char bairro[20];
 	char CEP[10];
 	char cidade[20];
 };
 
-struct house
-{
+struct house {
 	int reg_imov;
 	struct houseAddress address;
 	float area;
@@ -63,15 +57,13 @@ struct house
 	union data status;
 };
 
-struct date
-{
+struct date {
 	int day;
 	int month;
 	int year;
 };
 
-struct locatario
-{
+struct locatario {
 	int reg_loc; // gerado automaticamente
 	char nome[80];
 	char CPF[15];
@@ -131,20 +123,19 @@ int deleta_locatario(struct locatario _locatario);
 int compare_date(struct date _date1, struct date _date2);
 struct owner searchOwnerByRegister(int _register);
 void makeReport(struct date _date);
+void showStartMenu();
 
-int main()
-{
+int main() {
 	int op, want_rent, reg_num, pos, reg, opcao8, check,dat;
 	char cpf[15], parametro, opc, escolha;
 	struct house _house;
 	struct owner _owner;
 	struct locatario _locatario;
 	struct date _date;
-	do
-	{
+	do {
 		fflush(stdin);
 		system("cls");
-		printf("[0] Sair\n[1] Cadastro de proprietario\n[2] Cadastrar casa\n[3] Consulta proprietarios\n[4] Consulta casas\n[5] Aluguel\n[6] Consulta locatarios\n[7] Alterar sigla\n[8]Termino do contrato\n[9]Alteracao de cadastros\n[10]Relatorio\nOpcao: ");
+		showStartMenu();
 		scanf("%d", &op);
 		switch (op) {
 			case 0: {
@@ -195,20 +186,16 @@ int main()
 				}
 				break;
 			}
-
 			case 4: {
 				system("cls");
-					do
-					{
+					do {
 						printf("\nDeseja fazer uma consula [T]total ou  [P]parcial: ");
 						fflush(stdin);
 						scanf("%c", &escolha);
 						escolha = toupper(escolha);
 					} while (escolha != 'T' && escolha != 'P');
-					if (escolha == 'T')
-					{
-						do
-						{
+					if (escolha == 'T') {
+						do {
 							printf("\nParametro da pesquisa [L]livre ou [A]alugado: ");
 							fflush(stdin);
 							scanf("%c", &parametro);
@@ -217,8 +204,7 @@ int main()
 						fflush(stdin);
 						readHouses(parametro);
 					}
-					else
-					{
+					else {
 						system("cls");
 						float area;
 						int quartos, opp;
@@ -229,8 +215,7 @@ int main()
 							scanf("%d", &opp);
 						} while (opp < 1 || opp > 3);
 						system("cls");
-						switch (opp)
-						{
+						switch (opp) {
 							case 1: {
 								printf("\nArea util: ");
 								scanf("%f", &area);
@@ -373,6 +358,21 @@ int main()
 		}
 	} while (op != 0);
 	system("cls");
+}
+
+void showStartMenu() {	
+	printf("[0]  Sair\n");
+	printf("[1]  Cadastro de proprietario\n");
+	printf("[2]  Cadastrar casa\n");
+	printf("[3]  Consulta proprietarios\n");
+	printf("[4]  Consulta casas\n");
+	printf("[5]  Aluguel\n");
+	printf("[6]  Consulta locatarios\n");
+	printf("[7]  Alterar sigla\n");
+	printf("[8]  Termino do contrato\n");
+	printf("[9]  Alteracao de cadastros\n");
+	printf("[10] Relatorio\n");
+	printf("Opcao: ");
 }
 
 int countOwners() { 
