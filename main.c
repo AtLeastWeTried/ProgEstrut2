@@ -9,15 +9,19 @@ struct test {
 	char name[30];
 };
 
+void test();
 int countTest();
 void readAllTest();
 void writeTest(struct test _test);
 void alterTest(char newName[30], int pos);
 
 int main() {
-	int operador;
+	char newName[30];
+	int operador, pos;
 	struct test _test;
 	do {
+		getch();
+		system("CLS");
 		printf("[1] Cadastrar\n");
 		printf("[2] Consultar\n");
 		printf("[3] Alterar\n");
@@ -34,7 +38,18 @@ int main() {
 				readAllTest();
 				break;
 			case 3:
-				printf("\n");
+				readAllTest();
+				printf("\nRegistro: ");
+				scanf("%d", &pos);
+				printf("\nQual o novo nome: ");
+				fflush(stdin);
+				gets(newName);
+				alterTest(newName, pos);
+				readAllTest();
+				break;
+			case 4: 
+				readAllTest();
+				test(1);
 				break;
 			default:
 				printf("\nOpcao errada!");
@@ -43,6 +58,7 @@ int main() {
 	} while(operador != 0);
 }
 
+// wb = sobrepoe
 void writeTest(struct test _test) {
 	FILE *file = fopen(FILE_NAME, "ab");
 	if (file == NULL) {
@@ -71,16 +87,16 @@ int countTest() {
 void readAllTest() {
 	int loop, index;
 	struct test _test;
-	FILE *file = fopen(FILE_NAME, "rb");
+	FILE *file = fopen(FILE_NAME, "r");
 	if (file == NULL) {
 		printf("\nErro ao abrir o arquivo.");
 	}
 	else {
 		loop = countTest();
 		for (index = 0; index < loop; index++) {
+			fseek(file, index*sizeof(struct test), SEEK_SET);
 			fread(&_test, sizeof(struct test), 1, file);
 			printf("\n[%d]: Nome: %s", index, _test.name);
-			fseek(file, index*sizeof(struct test), SEEK_SET);
 		}
 		printf("\n\n");
 	}
@@ -88,16 +104,47 @@ void readAllTest() {
 }
 
 void alterTest(char newName[30], int pos) {
-	struct test _test;
-	FILE *file = fopen(FILE_NAME, "rb+");
+	int loop, index;
+	struct test *_test = NULL, current;
+	FILE *file = fopen(FILE_NAME, "rb");
 	if (file == NULL) {
 		printf("\nErro ao abrir o arquivo.");
 	}
 	else {
-		fseek(file, pos*sizeof(struct test), SEEK_SET);
-		fread(&_test, sizeof(struct test), 1, file);
-		strcpy(_test.name, newName);
-		fwrite(&_test, sizeof(struct test), 1, file);
+		loop = countTest();
+		_test = malloc(loop*sizeof(struct test));
+		for (index = 0; index < loop; index++) {
+			fseek(file, index*sizeof(struct test), SEEK_SET);
+			fread(&current, sizeof(struct test), 1, file);
+			strcpy((_test + index)->name, current.name);
+		}
+		fclose(file);
+		strcpy((_test + pos)->name, newName);
+		file = fopen(FILE_NAME, "wb");
+		fwrite(_test, sizeof(struct test), loop, file);
+	}
+	fclose(file);
+}
+
+void test(int pos) {
+	int loop, index;
+	struct test *_test = NULL, current;
+	FILE *file = fopen(FILE_NAME, "rb");
+	if (file == NULL) {
+		printf("\nErro ao abrir o arquivo.");
+	}
+	else {
+		loop = countTest();
+		_test = malloc(loop*sizeof(struct test));
+		for (index = 0; index < loop; index++) {
+			fseek(file, index*sizeof(struct test), SEEK_SET);
+			fread(&current, sizeof(struct test), 1, file);
+			strcpy((_test + index)->name, current.name);
+		}
+		fclose(file);
+		strcpy((_test + pos)->name, "test");
+		file = fopen(FILE_NAME, "wb");
+		fwrite(_test, sizeof(struct test), loop, file);
 	}
 	fclose(file);
 }
