@@ -10,6 +10,7 @@ struct test {
 };
 
 void test();
+void testMenu();
 int countTest();
 void readAllTest();
 void writeTest(struct test _test);
@@ -51,11 +52,41 @@ int main() {
 				readAllTest();
 				test(1);
 				break;
+			case 5: 
+				while (getch() != 48) {
+					testMenu();
+				}
+				break;
 			default:
 				printf("\nOpcao errada!");
 				break;
 		}
 	} while(operador != 0);
+}
+
+void testMenu() {
+	static int option = 0;
+	char caracter;
+	fflush(stdin);
+	caracter = getch();
+	if (caracter == 72 && option == 1) {
+		option = 0;
+	}
+	else if (caracter == 80 && option == 0) {
+		option = 1;
+	}
+	if (option == 0) {
+		system("CLS");
+		printf("\n> first option!");
+		printf("\nsecond option!");
+		printf("\n");
+	}
+	else if (option == 1) {
+		system("CLS");
+		printf("\nfirst option!");
+		printf("\n> second option!");
+		printf("\n");
+	}
 }
 
 // wb = sobrepoe
