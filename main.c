@@ -3,9 +3,22 @@
 #include <stdio.h>
 #include <ctype.h>
 
-#define FILE_NAME       "imovel.bin"        // Arquivo contendo os dados da struct House
-#define DIRECTORY       "proprietario.bin"  // Arquivo contendo os dados da struct Owner
-#define FILE_LOCATAERIO "locatario.bin"     // Arquivo contendo os dados da struct locatario
+// constantes de arquivos
+#define IMOVEL_FILE       			"imovel.bin"        // Arquivo contendo os dados da struct House
+#define PROPRIETARIO_FILE       "proprietario.bin"  // Arquivo contendo os dados da struct Owner
+#define LOCATARIO_FILE 					"locatario.bin"     // Arquivo contendo os dados da struct locatario
+
+// constantes semanticas
+#define SAIR 									0
+#define CRIAR_PROPRIETARIO 		1
+#define CRIAR_IMOVEL 					2
+#define LISTAR_PROPRIETARIO 	3
+#define LISTAR_IMOVEIS 				4
+#define ALUGAR_IMOVEL					5
+#define LISTAR_LOCATARIOS			6
+#define TERMINAR_CONTRATO			7
+#define REALIZAR_ALTERACAO		8
+#define GERAR_RELATORIO				9
 
 struct addressOwner {
 	char logradouro[80];
@@ -123,7 +136,6 @@ int deleta_locatario(struct locatario _locatario);
 int compare_date(struct date _date1, struct date _date2);
 struct owner searchOwnerByRegister(int _register);
 void makeReport(struct date _date);
-void showStartMenu();
 
 int main() {
 	int op, want_rent, reg_num, pos, reg, opcao8, check,dat;
@@ -360,25 +372,33 @@ int main() {
 	system("cls");
 }
 
-void showStartMenu() {	
-	printf("[0]  Sair\n");
-	printf("[1]  Cadastro de proprietario\n");
-	printf("[2]  Cadastrar casa\n");
-	printf("[3]  Consulta proprietarios\n");
-	printf("[4]  Consulta casas\n");
-	printf("[5]  Aluguel\n");
-	printf("[6]  Consulta locatarios\n");
-	printf("[7]  Alterar sigla\n");
-	printf("[8]  Termino do contrato\n");
-	printf("[9]  Alteracao de cadastros\n");
-	printf("[10] Relatorio\n");
+int getOptions() {
+	int option;
+	printf("[0] Sair\n");
+	printf("[1] Cadastro de proprietario\n");
+	printf("[2] Cadastrar casa\n");
+	printf("[3] Consultar proprietarios\n");
+	printf("[4] Consultar imoveis\n");
+	printf("[5] Aluguel imovel\n");
+	printf("[6] Consultar locatarios\n");
+	printf("[7] Termino do contrato\n");
+	printf("[8] Alteracao de cadastros\n");
+	printf("[9] Relatorio\n");
 	printf("Opcao: ");
+	scanf("%d", &option);
+	if (option >= 0 && option <= 9) {
+		return option;
+	}
+	else {
+		printf("\nOpcao errada!\n");
+		return getOptions();
+	}
 }
 
 int countOwners() { 
 	long int cont = 0;
 	FILE *fptr = NULL;
-	if ((fptr = fopen(DIRECTORY, "rb")) == NULL)
+	if ((fptr = fopen(PROPRIETARIO_FILE, "rb")) == NULL)
 	{
 		return cont; //Retornaria 0 pois o arquivo ainda não existe.
 	}
@@ -595,7 +615,7 @@ struct informacao_casa stdWriteHouseOwner() {
 }
 
 void writeOwner(struct owner _owner) { 
-	FILE *file = fopen(DIRECTORY, "ab");
+	FILE *file = fopen(PROPRIETARIO_FILE, "ab");
 	if (file == NULL)	
 		printf("Erro ao abrir o arquivo!\n");
 	else 
@@ -616,7 +636,7 @@ void stdReadOwner(struct owner _owner) {
 void readOwners() { 
 	int i;
 	struct owner _owner;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para a leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para a leitura
 	if (file == NULL) {
 		printf("Nenhum proprietario registrado.\n");
 	}
@@ -635,7 +655,7 @@ void readOwners() {
 void searchByCPF(char cpf[15]) { 
 	int i, j, cmp;
 	struct owner _owner;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -659,7 +679,7 @@ void searchByCPF(char cpf[15]) {
 int searchCPF_owner(char cpf[15]) { //Função para busca dos dados que se encontram com o CPF requerido
 	int i, j, cmp;
 	struct owner _owner;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -684,7 +704,7 @@ int searchCPF_owner(char cpf[15]) { //Função para busca dos dados que se encon
 int searchREG_house(int reg) { //Função para busca dos dados que se encontram com o reg requerido
 	int i, j;
 	struct house _house;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -708,7 +728,7 @@ int searchREG_house(int reg) { //Função para busca dos dados que se encontram 
 int searchCPF_locatario(char cpf[15]) {
 	int i, j, cmp;
 	struct locatario _locatario;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 			printf("Erro ao abrir o arquivo!\n");
 	}
@@ -733,7 +753,7 @@ struct locatario searchLocatariobyCPF(char cpf[15])
 {
 	int i, j, cmp;
 	struct locatario _locatario;
-	FILE *file = fopen(FILE_LOCATAERIO, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(LOCATARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -793,7 +813,7 @@ void stdReadHouse(struct house _house) {
 void readHouses(char op) {
 	int i;
 	struct house _house;
-	FILE *file = fopen(FILE_NAME, "rb"); //Abertura do Arquivo
+	FILE *file = fopen(IMOVEL_FILE, "rb"); //Abertura do Arquivo
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -829,7 +849,7 @@ void readHouseBairro(char bairro[20])
 	for (j = 0; j < strlen(bairro); j++)
 		bairro[j] = tolower(bairro[j]);
 
-	FILE *file = fopen(FILE_NAME, "rb"); //Abertura do Arquivo
+	FILE *file = fopen(IMOVEL_FILE, "rb"); //Abertura do Arquivo
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -857,7 +877,7 @@ void readHouseRoom(int quartos)
 {
 	int i, j, cont = 0;
 	struct house _house;
-	FILE *file = fopen(FILE_NAME, "rb"); //Abertura do Arquivo
+	FILE *file = fopen(IMOVEL_FILE, "rb"); //Abertura do Arquivo
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -882,7 +902,7 @@ void readHouseArea(float area)
 {
 	int i, j, cont = 0;
 	struct house _house;
-	FILE *file = fopen(FILE_NAME, "rb"); //Abertura do Arquivo
+	FILE *file = fopen(IMOVEL_FILE, "rb"); //Abertura do Arquivo
 	if (file == NULL) {
 			printf("Erro ao abrir o arquivo!\n");
 	}
@@ -907,7 +927,7 @@ void readHouseArea(float area)
 int countHouses() { 
 	long int cont = 0;
 	FILE *fptr = NULL;
-	if ((fptr = fopen(FILE_NAME, "rb")) == NULL) {                //Abertura do Arquivo
+	if ((fptr = fopen(IMOVEL_FILE, "rb")) == NULL) {                //Abertura do Arquivo
 		return cont; //Caso ele não ache, o retorno será 0 pois o arquivo não existe ainda;
 	}
 	else {
@@ -952,7 +972,7 @@ struct house stdWriteHouse() { //Função de cadastro básico da struct house
 }
 
 void writeHouse(struct house _house) { //Escrita dos dados armazenados na ROM para o arquivo house.bin
-	FILE *file = fopen(FILE_NAME, "ab");
+	FILE *file = fopen(IMOVEL_FILE, "ab");
 	if (file == NULL) {
 		printf("\nErro ao abrir o arquivo!");
 	}
@@ -965,7 +985,7 @@ void writeHouse(struct house _house) { //Escrita dos dados armazenados na ROM pa
 int searchByRegister(int _register)
 {
 	struct house _house;
-	FILE *file = fopen(FILE_NAME, "rb");
+	FILE *file = fopen(IMOVEL_FILE, "rb");
 	int i;
 	if (file == NULL) {
 		printf("\nNenhuma casa registrada.");
@@ -989,7 +1009,7 @@ int searchByRegister(int _register)
 struct house searchHouseByRegister(int _register)
 {
 	struct house _house;
-	FILE *file = fopen(FILE_NAME, "rb");
+	FILE *file = fopen(IMOVEL_FILE, "rb");
 	int i;
 	if (file == NULL) {
 		printf("\nNenhuma casa registrada.");
@@ -1012,7 +1032,7 @@ struct house searchHouseByRegister(int _register)
 struct owner searchOwnerByRegister(int _register)
 {
 	struct owner _owner;
-	FILE *file = fopen(DIRECTORY, "rb");
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb");
 	int i;
 	if (file == NULL) {
 		printf("\nNenhuma casa registrada.");
@@ -1066,7 +1086,7 @@ struct date inputDate() {
 int countLocatario() {
 	long int count = 0;
 	FILE *fptr = NULL;
-	if ((fptr = fopen(FILE_LOCATAERIO, "rb")) == NULL) {                 //Abertura do Arquivo
+	if ((fptr = fopen(LOCATARIO_FILE, "rb")) == NULL) {                 //Abertura do Arquivo
 		return count; //Caso ele não ache, o retorno será 0 pois o arquivo não existe ainda;
 	}
 	else {
@@ -1127,7 +1147,7 @@ void stdWriteLocatario(struct locatario _locatario) {
 
 void writeLocatario(struct locatario _locatario) { //Escrita dos dados armazenados na ROM para o arquivo locatario.bin
 	_locatario.reg_loc = countLocatario();
-	FILE *file = fopen(FILE_LOCATAERIO, "ab");
+	FILE *file = fopen(LOCATARIO_FILE, "ab");
 	if (file == NULL) {
 		printf("\nErro ao abrir o arquivo!");
 	}
@@ -1141,7 +1161,7 @@ void readLocatarios()
 { //Função geral de Leitura dos dados
 	int i;
 	struct locatario _locatario;
-	FILE *file = fopen(FILE_LOCATAERIO, "rb"); //Abertura do arquivo para a leitura
+	FILE *file = fopen(LOCATARIO_FILE, "rb"); //Abertura do arquivo para a leitura
 	if (file == NULL) {
 		printf("Nenhum locatario registrado.\n");
 	}
@@ -1198,7 +1218,7 @@ void endContract(struct locatario _locatario) {
 int searchCPF_house(int reg) { //Função para busca dos dados que se encontram com o reg requerido
 	int i, j;
 	struct house _house;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -1222,7 +1242,7 @@ int searchCPF_house(int reg) { //Função para busca dos dados que se encontram 
 struct locatario search_locatario(char cpf[15]) {
 	int i, cmp;
 	struct locatario _locatario;
-	FILE *file = fopen(DIRECTORY, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
@@ -1244,7 +1264,7 @@ struct locatario search_locatario(char cpf[15]) {
 void makeReport(struct date _date) {
 	int i, cmp;
 	struct locatario _locatario;
-	FILE *file = fopen(FILE_LOCATAERIO, "rb"); //Abertura do arquivo para leitura
+	FILE *file = fopen(LOCATARIO_FILE, "rb"); //Abertura do arquivo para leitura
 	if (file == NULL) {
 		printf("Erro ao abrir o arquivo!\n");
 	}
