@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <conio.h>
 
 // constantes de arquivos
 #define IMOVEL_FILE       			"imovel.bin"        // Arquivo contendo os dados da struct House
@@ -89,15 +90,11 @@ struct locatario {
 
 // Funcoes de Proprietario
 int countOwners();                                              // Retorna a quantidade de proprietarios no arquivo
-struct addressOwner stdWriteAddressOwner();                     // Cadastro da struct addressOwner
 struct owner stdWriteOwner();                                   // Cadastro da struct geral owner
-struct informacao_casa stdWriteHouseOwner();                    // Cadastro da struct informacao_casa
 void writeOwner(struct owner _owner);                           // Escrita dos dados Owner para o arquivo
 void stdReadOwner(struct owner _owner);                         // Mostra dos dados salvos referente ao Owner
 void readOwners();                                              // Leitura dos dados contidos no arquivo referente ao owner
 void searchByCPF(char cpf[15]);                                 // Função para busca com filtro referente ao CPF
-void stdReadAddressOwner(struct addressOwner _address);         // Mostra dos dados da struct addressOwner
-void stdReadOwnerHouseAddress(struct informacao_casa _address); // Mostra dos dados da struct informacao_casa
 int searchCPF_owner(char cpf[15]);
 void altera_sigla_owner(int pos);
 
@@ -137,243 +134,63 @@ int compare_date(struct date _date1, struct date _date2);
 struct owner searchOwnerByRegister(int _register);
 void makeReport(struct date _date);
 
-int main() {
-	int op, want_rent, reg_num, pos, reg, opcao8, check,dat;
-	char cpf[15], parametro, opc, escolha;
-	struct house _house;
-	struct owner _owner;
-	struct locatario _locatario;
-	struct date _date;
-	do {
-		fflush(stdin);
-		system("cls");
-		showStartMenu();
-		scanf("%d", &op);
-		switch (op) {
-			case 0: {
-				printf("Fim do programa");
-				break;
-			}
-			case 1: {
-				system("cls");
-				_owner = stdWriteOwner();
-				writeOwner(_owner);
-				break;
-			}
-			case 2: {
-				system("cls");
-				if (countOwners() == 0)
-				{
-					printf("\nNão existem proprietarios registrados.");
-				}
-				else
-				{
-					_house = stdWriteHouse();
-					writeHouse(_house);
-				}
-				break;
-			}	
-			case 3: {
-				system("cls");
-				do
-				{
-					printf("\nDeseja realizar uma consulta [T]total ou [P]parcial: ");
-					fflush(stdin);
-					scanf("%c", &opc);
-					opc = toupper(opc);
-				} while (opc != 'T' && opc != 'P');
-				if (opc == 'T')
-				{
-					system("cls");
-					readOwners();
-				}
-				else if (opc == 'P')
-				{
-					system("cls");
-					printf("Informe o CPF: ");
-					fflush(stdin);
-					gets(cpf);
-					searchByCPF(cpf);
-					system("pause");
-				}
-				break;
-			}
-			case 4: {
-				system("cls");
-					do {
-						printf("\nDeseja fazer uma consula [T]total ou  [P]parcial: ");
-						fflush(stdin);
-						scanf("%c", &escolha);
-						escolha = toupper(escolha);
-					} while (escolha != 'T' && escolha != 'P');
-					if (escolha == 'T') {
-						do {
-							printf("\nParametro da pesquisa [L]livre ou [A]alugado: ");
-							fflush(stdin);
-							scanf("%c", &parametro);
-							parametro = toupper(parametro);
-						} while (parametro != 'L' && parametro != 'A');
-						fflush(stdin);
-						readHouses(parametro);
-					}
-					else {
-						system("cls");
-						float area;
-						int quartos, opp;
-						char bairro[20];
-						do {
-							system("cls");
-							printf("\nDeseja fazer consulta com:\n[1] Area util\n[2] Quantidade de quartos\n[3] Bairro\nOpcao: ");
-							scanf("%d", &opp);
-						} while (opp < 1 || opp > 3);
-						system("cls");
-						switch (opp) {
-							case 1: {
-								printf("\nArea util: ");
-								scanf("%f", &area);
-								readHouseArea(area);
-								break;
-							}
-							case 2: {
-								printf("\nQuantidade de quartos: ");
-								scanf("%d", &quartos);
-								readHouseRoom(quartos);
-								break;
-							}
-							case 3: {
-								printf("Bairro: ");
-								fflush(stdin);
-								gets(bairro);
-								readHouseBairro(bairro);
-								break;
-							}
-							default: {
-								printf("Easteregg, Achievement Unlocked");
-								break;
-							}
-						}
-					}
-					break;
-			}	
-			case 5: {
-				system("cls");
-				printf("\n----------Casas Para Aluguel----------\n");
-				readHouses('L');
-				printf("\nRegistro do imovel que deseja alugar: ");
-				scanf("%d", &reg_num);
-				pos = searchByRegister(reg_num);
-				printf("\nPos: %d", pos);
-				if (pos < 0)
-				{
-					printf("\nRegistro inexistente.");
-					system("pause");
-					break;
-				}
-				_locatario = stdReadLocatario();
-				_locatario.reg_imov = pos + 1;
-				writeLocatario(_locatario);
-				break;
-			}
-			case 6: {
-				system("cls");
-				readLocatarios();
-				break;
-			}
-			case 7: {
-				printf("\nRegistro da casa a alterar: ");
-				scanf("%d", &reg);
-				alterStatusHouse(reg);
-				break;
-			}
-			case 8: {
-				printf("\nComece digitando o seu cpf");
-				scanf("%d", &cpf);
-				_locatario = search_locatario(cpf);
-				stdWriteLocatario(_locatario);
-				printf("\nDigite o ano atual: ");
-				scanf("%d", &dat);
+int getOptions();
+void criar_proprietario();
 
-				deleta_locatario(_locatario);
-				searchCPF_owner(_locatario.CPF);
-				
-				if (dat > _locatario.termino.year)
-				{
-					printf("\nDigite agora o mes atual");
-					scanf("%d", &dat);
-					if (dat >_locatario.termino.month)
-					{
-						printf("\nDigite agora o dia atual");
-						scanf("%d", &dat);
-						if (dat == _locatario.termino.day)
-						{
-						}
-					}
-				}
-				break;
-			}
-			case 9: {
-				printf("\nRealizar alteracao em:\n[1]Proprietario\t[2]Imovel\t[3]Locatario");
-				scanf("%d", &opcao8);
-				switch (opcao8)
-					{
-					case 1:	{
-						printf("Digite o CPF do proprietario");
-						fflush(stdin);
-						gets(cpf);
-						check = searchCPF_owner(cpf);
-						check = altera_owner(check);
-						if (check == 1)
-						{
-							printf("\n\nLeitura dos dados finalizados.");
-							readOwners();
-						}
-						break;
-					}
-					case 2: {
-						printf("Digite numero de registro do imovel");
-						fflush(stdin);
-						scanf("%d", &reg);
-						check = searchREG_house(check);
-						check = altera_house(check);
-						if (check == 1)
-						{
-							printf("\n\nLeitura dos dados finalizados.");
-							// readHouses();
-						}
-						break;
-					}
-					case 3: {
-						printf("Digite numero de CPF do locatario");
-						fflush(stdin);
-						gets(cpf);
-						check = searchCPF_locatario(cpf);
-						check = altera_locatario(check);
-						if (check == 1) {
-							printf("\n\nLeitura dos dados finalizados.");
-							readLocatarios();
-						}
-						break;
-					}
-				}
-				break;
-			}
-			case 10: {
-				_date = inputDate();
-				makeReport(_date);
-				system("pause");
-				break;
-			}
-			default: {
-				printf("Opcao nao existente");
-				break;
-			}
+int main() {
+	int option;
+	while((option = getOptions()) != 0) {
+		switch (option) {
+		case SAIR:
+			printf("\nFim do programa.");
+			getch();
+			exit(1);
+			break;
+		case CRIAR_PROPRIETARIO:
+			criar_proprietario();
+			getch();
+			break;
+		case CRIAR_IMOVEL:
+			printf("\nCRIAR_IMOVEL.");
+			getch();
+			break;
+		case LISTAR_PROPRIETARIO:
+			printf("\nLISTAR_PROPRIETARIO.");
+			getch();
+			break;
+		case LISTAR_IMOVEIS:
+			printf("\nLISTAR_IMOVEIS.");
+			getch();
+			break;
+		case ALUGAR_IMOVEL:
+			printf("\nALUGAR_IMOVEL.");
+			getch();
+			break;
+		case LISTAR_LOCATARIOS:
+			printf("\nLISTAR_LOCATARIOS.");
+			getch();
+			break;
+		case TERMINAR_CONTRATO:
+			printf("\nTERMINAR_CONTRATO.");
+			getch();
+			break;
+		case REALIZAR_ALTERACAO:
+			printf("\nREALIZAR_ALTERACAO.");
+			getch();
+			break;
+		case GERAR_RELATORIO:
+			printf("\nGERAR_RELATORIO.");
+			getch();
+			break;
+		default:
+			break;
 		}
-	} while (op != 0);
-	system("cls");
+	}
 }
 
 int getOptions() {
 	int option;
+	system("CLS");
 	printf("[0] Sair\n");
 	printf("[1] Cadastro de proprietario\n");
 	printf("[2] Cadastrar casa\n");
@@ -391,8 +208,56 @@ int getOptions() {
 	}
 	else {
 		printf("\nOpcao errada!\n");
+		getch();
 		return getOptions();
 	}
+}
+
+// case CRIAR_PROPRIETARIO
+void criar_proprietario() {
+	struct owner _owner = stdWriteOwner();
+	stdReadOwner(_owner);
+}
+
+// case CRIAR_IMOVEL
+void criar_imovel() {
+
+}
+
+// case LISTAR_PROPRIETARIO
+void listar_proprietarios() {
+	
+}
+
+// case LISTAR_IMOVEIS
+void listar_imoveis() {
+
+}
+
+// case ALUGAR_IMOVEL
+void alugar_imovel() {
+
+}
+
+
+// case LISTAR_LOCATARIOS
+void listar_locatarios() {
+
+}
+
+// case TERMINAR_CONTRATO
+void terminar_contrato() {
+
+}
+
+// case REALIZAR_ALTERACAO
+void realizar_alteracao() {
+
+}
+
+// case GERAR_RELATORIO
+void gerar_relatorio() {
+
 }
 
 int countOwners() { 
@@ -409,27 +274,6 @@ int countOwners() {
 		fclose(fptr);
 		return cont; //Retorna quantos dados dessa struct existem no arquivo owner.bin
 	}
-}
-
-struct addressOwner stdWriteAddressOwner() { 
-	struct addressOwner _address;
-	printf("informe o logradouro: ");
-	gets(_address.logradouro);
-	printf("inform o bairro: ");
-	gets(_address.bairro);
-	printf("informe o CEP: ");
-	gets(_address.CEP);
-	printf("informe a cidade: ");
-	gets(_address.cidade);
-	printf("informe o estado: ");
-	gets(_address.estado);
-	printf("informe o fone: ");
-	gets(_address.fone);
-	printf("informe o cel: ");
-	gets(_address.cel);
-	printf("informe o email: ");
-	gets(_address.email);
-	return _address; //Retorna a nova struct.
 }
 
 void altera_sigla_owner(int pos) {
@@ -590,28 +434,37 @@ int deleta_locatario(struct locatario _locatario) {
 
 struct owner stdWriteOwner() { 
 	struct owner _owner;
+	_owner.qntd_de_casas = 0;
+	_owner.reg_prop = 1 + countOwners();      //retorna quantos dados existem dentro do arquivo + 1 para o registro do proprietario começar em 1.
 	printf("Informe o nome: ");
 	fflush(stdin);
 	gets(_owner.nome);
 	printf("Informe o CPF: ");
 	fflush(stdin);
 	gets(_owner.CPF);
-	_owner.qntd_de_casas = 0;
-	_owner.reg_prop = 1 + countOwners();      //retorna quantos dados existem dentro do arquivo + 1 para o registro do proprietario começar em 1.
-	_owner.sAddress = stdWriteAddressOwner(); //Escrita da struct interna addressOwner e retornando a mesma preenchida.
-	_owner.sCasa = stdWriteHouseOwner();      //Escrita da struct interna informacao_casa e retornando a mesma preenchida.
-	return _owner;                            //Retorna a struct Owner toda preenchida.
-}
-
-struct informacao_casa stdWriteHouseOwner() { 
-	struct informacao_casa casa;
+	printf("informe o logradouro: ");
+	gets(_owner.sAddress.logradouro);
+	printf("inform o bairro: ");
+	gets(_owner.sAddress.bairro);
+	printf("informe o CEP: ");
+	gets(_owner.sAddress.CEP);
+	printf("informe a cidade: ");
+	gets(_owner.sAddress.cidade);
+	printf("informe o estado: ");
+	gets(_owner.sAddress.estado);
+	printf("informe o fone: ");
+	gets(_owner.sAddress.fone);
+	printf("informe o cel: ");
+	gets(_owner.sAddress.cel);
+	printf("informe o email: ");
+	gets(_owner.sAddress.email);
 	printf("\nInforme o numero da casa: ");
 	fflush(stdin);
-	scanf("%d", &casa.num_casa);
+	scanf("%d", &_owner.sCasa.num_casa);
 	printf("\nInforme o status da casa: ");
 	fflush(stdin);
-	scanf("%c", &casa.status_casa);
-	return casa; //Retorna a struct prenchida
+	scanf("%c", &_owner.sCasa.status_casa);
+	return _owner;                            //Retorna a struct Owner toda preenchida.
 }
 
 void writeOwner(struct owner _owner) { 
@@ -629,8 +482,18 @@ void stdReadOwner(struct owner _owner) {
 	printf("Nome: %s\n", _owner.nome);
 	printf("CPF: %s\n", _owner.CPF);
 	printf("Registro de proprietario: %d\n", _owner.reg_prop);
-	stdReadAddressOwner(_owner.sAddress);   //Função que mostra os dados da struct interna addressOwner
-	stdReadOwnerHouseAddress(_owner.sCasa); //Função que mostra os dados da struct interna informacao_casa
+	printf("----------Endereco do proprietario----------\n");
+	printf("Logradouro: %s\n", _owner.sAddress.logradouro);
+	printf("Bairro: %s\n", _owner.sAddress.bairro);
+	printf("CEP: %s\n", _owner.sAddress.CEP);
+	printf("Cidade: %s\n", _owner.sAddress.cidade);
+	printf("Estado: %s\n", _owner.sAddress.estado);
+	printf("Fone: %s\n", _owner.sAddress.fone);
+	printf("Cel: %s\n", _owner.sAddress.cel);
+	printf("Email: %s\n", _owner.sAddress.email);
+	printf("----------Endereco da casa----------\n");
+	printf("Numero da casa: %d\n", _owner.sCasa.num_casa);
+	printf("Status da casa: %c\n", _owner.sCasa.status_casa);
 }
 
 void readOwners() { 
@@ -772,25 +635,6 @@ struct locatario searchLocatariobyCPF(char cpf[15])
 	printf("\nNenhum proprietario encontrado com este cpf\n");
 }
 
-// ENDERECO DO OWNER
-void stdReadAddressOwner(struct addressOwner _address) { 
-	printf("----------Endereco do proprietario----------\n");
-	printf("Logradouro: %s\n", _address.logradouro);
-	printf("Bairro: %s\n", _address.bairro);
-	printf("CEP: %s\n", _address.CEP);
-	printf("Cidade: %s\n", _address.cidade);
-	printf("Estado: %s\n", _address.estado);
-	printf("Fone: %s\n", _address.fone);
-	printf("Cel: %s\n", _address.cel);
-	printf("Email: %s\n", _address.email);
-}
-
-// CASA DO OWNER
-void stdReadOwnerHouseAddress(struct informacao_casa _address) { 
-	printf("----------Endereco da casa----------\n");
-	printf("Numero da casa: %d\n", _address.num_casa);
-	printf("Status da casa: %c\n", _address.status_casa);
-}
 
 void stdReadHouseAddress(struct houseAddress _house) {
 	printf("Logradouro da casa: %s\n", _house.logradouro);
