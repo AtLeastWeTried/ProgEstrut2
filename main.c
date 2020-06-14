@@ -189,8 +189,9 @@ int main() {
 }
 
 int getOptions() {
-	int option;
+	static int option;
 	system("CLS");
+	printf("\nUtilize as setas do teclado(%d/%d) e ENTER para selecionar uma opcao.\n");
 	printf("[0] Sair\n");
 	printf("[1] Cadastro de proprietario\n");
 	printf("[2] Cadastrar casa\n");
@@ -217,16 +218,17 @@ int getOptions() {
 void criar_proprietario() {
 	struct owner _owner = stdWriteOwner();
 	stdReadOwner(_owner);
+	writeOwner(_owner);
 }
 
 // case CRIAR_IMOVEL
 void criar_imovel() {
-
+	
 }
 
 // case LISTAR_PROPRIETARIO
 void listar_proprietarios() {
-	
+	readOwners();
 }
 
 // case LISTAR_IMOVEIS
