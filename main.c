@@ -144,12 +144,15 @@ void alugar_imovel();
 
 int main() {
 	int option;
-	while((option = getOptions()) != 0) {
+	do {
 		system("CLS");
+		option = getOptions();
 		switch (option) {
 		case SAIR:
+			system("CLS");
 			printf("\nFim do programa.");
 			getch();
+			system("CLS");
 			exit(1);
 			break;
 		case CRIAR_PROPRIETARIO:
@@ -191,7 +194,7 @@ int main() {
 		default:
 			break;
 		}
-	}
+	}while(option != 0);
 }
 
 int getOptions() {
@@ -251,8 +254,11 @@ void criar_imovel() {
 
 // case LISTAR_PROPRIETARIO
 void listar_proprietarios() {
-	char cpf[15];
-	int index, option;
+	char cpf[15], caracter, messages[][80] = {
+		"Listar todos",
+		"Pesquisar por CPF"
+	};
+	int index, option = 0;
 	long proprietarios;
 	struct owner _owner;
 	FILE *file = fopen(PROPRIETARIO_FILE, "rb");
@@ -260,16 +266,32 @@ void listar_proprietarios() {
 		printf("\nNenhum proprietario registrado.");
 	}
 	else {
+		system("CLS");
 		do {
-			printf("\n[1] Listar todos\n[2] Pesquisar por CPF\nOpcao: ");
-			scanf("%d", &option);
-			if (option != 1 && option != 2) {
-				printf("\nOpcao errada!");
+		printf("\nUtilize as setas do teclado(%c/%c) e ENTER para selecionar uma opcao.\n", 24, 25);
+		for (index = 0; index < 2; index++) {
+			if (option == index) {
+				printf("\n> %s", messages[index]);
 			}
-		} while(option != 1 && option != 2);
+			else {
+				printf("\n%s", messages[index]);
+			}
+		}
+		do {
+			caracter = getch();
+		} while ((caracter == 72 && option == 0) || (caracter == 80 && option == 1) || (caracter != 72 && caracter != 80 && caracter != 13));
+		if (caracter == 72 && option != 0) {
+			option = option - 1;
+			system("CLS");
+		}
+		else if (caracter == 80 && option != 1) {
+			option = option + 1;
+			system("CLS");
+		}
+	}	while(caracter != 13);
 		fseek(file, 0, SEEK_END);
 		proprietarios = ftell(file) / sizeof(struct owner);
-		if (option == 1) {
+		if (option == 0) {
 			for (index = 0; index < proprietarios; index++) {
 				fseek(file, index*sizeof(struct owner), SEEK_SET);
 				fread(&_owner, sizeof(struct owner), 1, file);
@@ -277,12 +299,14 @@ void listar_proprietarios() {
 			}
 		}
 		else {
+			system("CLS");
 			printf("\nInforme o CPF: ");
 			fflush(stdin);
 			gets(cpf);
 			for (index = 0; index < proprietarios; index++) {
 				fseek(file, index*sizeof(struct owner), SEEK_SET);
 				fread(&_owner, sizeof(struct owner), 1, file);
+				system("CLS");
 				if (strcmp(_owner.CPF, cpf) == 0) {
 					stdReadOwner(_owner);
 					return;
@@ -296,8 +320,12 @@ void listar_proprietarios() {
 
 // case LISTAR_IMOVEIS
 void listar_imoveis() {
-	char aux;
-	int index, option, count = 0;
+	char aux, caracter, messages[][80] = {
+		"Listar todos imoveis",
+		"Listar imoveis Livres",
+		"Listar imoveis alugados"
+	};
+	int index, option = 0, count = 0;
 	long imoveis;
 	struct house _house;
 	FILE *file = fopen(IMOVEL_FILE, "rb");
@@ -308,20 +336,36 @@ void listar_imoveis() {
 		fseek(file, 0, SEEK_END);
 		imoveis = ftell(file) / sizeof(struct house);
 		do {
-			printf("\n[1] Listar todos imoveis\n[2] Listar imoveis Livres\n[3] Listar imoveis alugados\nEscolha: ");
-			scanf("%d", &option);
-			if (option < 1 || option > 3) {
-				printf("\nOpcao errada");
+			printf("\nUtilize as setas do teclado(%c/%c) e ENTER para selecionar uma opcao.\n", 24, 25);
+			for (index = 0; index < 3; index++) {
+				if (option == index) {
+					printf("\n> %s", messages[index]);
+				}
+				else {	
+					printf("\n%s", messages[index]);
+				}
 			}
-		} while (option < 1 || option > 3);
+			do {
+				caracter = getch();
+			} while ((caracter == 72 && option == 0) || (caracter == 80 && option == 2) || (caracter != 72 && caracter != 80 && caracter != 13));
+			if (caracter == 72 && option != 0) {
+				option = option - 1;
+				system("CLS");
+			}
+			else if (caracter == 80 && option != 2) {
+				option = option + 1;
+				system("CLS");
+			}
+		} while (caracter != 13);
+		system("CLS");
 		switch (option) {
-		case 1:
+		case 0:
 			aux = 'T';
 			break;
-		case 2:
+		case 1:
 			aux = 'L';
 			break;
-		case 3:
+		case 2:
 			aux = 'A';
 			break;
 		default:
