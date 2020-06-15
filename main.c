@@ -135,11 +135,17 @@ struct owner searchOwnerByRegister(int _register);
 void makeReport(struct date _date);
 
 int getOptions();
+void criar_imovel();
+void listar_imoveis();
 void criar_proprietario();
+void listar_proprietarios();
+void listar_locatarios();
+void alugar_imovel();
 
 int main() {
 	int option;
 	while((option = getOptions()) != 0) {
+		system("CLS");
 		switch (option) {
 		case SAIR:
 			printf("\nFim do programa.");
@@ -151,23 +157,23 @@ int main() {
 			getch();
 			break;
 		case CRIAR_IMOVEL:
-			printf("\nCRIAR_IMOVEL.");
+			criar_imovel();
 			getch();
 			break;
 		case LISTAR_PROPRIETARIO:
-			printf("\nLISTAR_PROPRIETARIO.");
+			listar_proprietarios();
 			getch();
 			break;
 		case LISTAR_IMOVEIS:
-			printf("\nLISTAR_IMOVEIS.");
+			listar_imoveis();
 			getch();
 			break;
 		case ALUGAR_IMOVEL:
-			printf("\nALUGAR_IMOVEL.");
+			alugar_imovel();
 			getch();
 			break;
 		case LISTAR_LOCATARIOS:
-			printf("\nLISTAR_LOCATARIOS.");
+			listar_locatarios();
 			getch();
 			break;
 		case TERMINAR_CONTRATO:
@@ -223,28 +229,176 @@ void criar_proprietario() {
 
 // case CRIAR_IMOVEL
 void criar_imovel() {
-	
+	struct house _house = stdWriteHouse();
+	stdReadHouse(_house);
+	writeHouse(_house);
 }
 
 // case LISTAR_PROPRIETARIO
 void listar_proprietarios() {
-	readOwners();
+	char cpf[15];
+	int index, option;
+	long proprietarios;
+	struct owner _owner;
+	FILE *file = fopen(PROPRIETARIO_FILE, "rb");
+	if (file == NULL) {
+		printf("\nNenhum proprietario registrado.");
+	}
+	else {
+		do {
+			printf("\n[1] Listar todos\n[2] Pesquisar por CPF\nOpcao: ");
+			scanf("%d", &option);
+			if (option != 1 && option != 2) {
+				printf("\nOpcao errada!");
+			}
+		} while(option != 1 && option != 2);
+		fseek(file, 0, SEEK_END);
+		proprietarios = ftell(file) / sizeof(struct owner);
+		if (option == 1) {
+			for (index = 0; index < proprietarios; index++) {
+				fseek(file, index*sizeof(struct owner), SEEK_SET);
+				fread(&_owner, sizeof(struct owner), 1, file);
+				stdReadOwner(_owner);
+			}
+		}
+		else {
+			printf("\nInforme o CPF: ");
+			fflush(stdin);
+			gets(cpf);
+			for (index = 0; index < proprietarios; index++) {
+				fseek(file, index*sizeof(struct owner), SEEK_SET);
+				fread(&_owner, sizeof(struct owner), 1, file);
+				if (strcmp(_owner.CPF, cpf) == 0) {
+					stdReadOwner(_owner);
+					return;
+				}
+			}
+			printf("\nProprietario nao encontrado.");
+		}
+	}
+	fclose(file);
 }
 
 // case LISTAR_IMOVEIS
 void listar_imoveis() {
-
+	char aux;
+	int index, option, count = 0;
+	long imoveis;
+	struct house _house;
+	FILE *file = fopen(IMOVEL_FILE, "rb");
+	if (file == NULL) {
+		printf("\nNenhum imovel registrado.");
+	}
+	else {
+		fseek(file, 0, SEEK_END);
+		imoveis = ftell(file) / sizeof(struct house);
+		do {
+			printf("\n[1] Listar todos imoveis\n[2] Listar imoveis Livres\n[3] Listar imoveis alugados\nEscolha: ");
+			scanf("%d", &option);
+			if (option < 1 || option > 3) {
+				printf("\nOpcao errada");
+			}
+		} while (option < 1 || option > 3);
+		switch (option) {
+		case 1:
+			aux = 'T';
+			break;
+		case 2:
+			aux = 'L';
+			break;
+		case 3:
+			aux = 'A';
+			break;
+		default:
+			break;
+		}
+		for (index = 0; index < imoveis; index++) {
+			fseek(file, index*sizeof(struct house), SEEK_SET);
+			fread(&_house, sizeof(struct house), 1, file);
+			if (aux == _house.status.sigla || aux == 'T') {
+				stdReadHouse(_house);
+				count++;
+			}
+		}
+		if (count == 0) {
+			printf("\nNenhum registro para essa opcao registrado.");
+		}
+	}
+	fclose(file);
 }
 
 // case ALUGAR_IMOVEL
 void alugar_imovel() {
-
+	int index, countFreeHouses = 0, registro;
+	long imoveis;
+	struct house _house;
+	struct house *houses;
+	FILE *file = fopen(IMOVEL_FILE, "rb");
+	if (file == NULL) {
+		printf("\nNenhum imovel registrado.");
+	}
+	else {
+		fseek(file, 0, SEEK_END);
+		imoveis = ftell(file) / sizeof(struct house);
+		for (index = 0; index < imoveis; index++) {
+			fseek(file, index*sizeof(struct house), SEEK_SET);
+			fread(&_house, sizeof(struct house), 1, file);
+			if (_house.status.sigla == 'L') {
+				countFreeHouses++;
+			}
+		}
+		if (countFreeHouses == 0) {
+			printf("\nNenhum imovel para alugar!");
+		}
+		else {
+			for (index = 0; index < imoveis; index++) {
+				fseek(file, index*sizeof(struct house), SEEK_SET);
+				fread(&_house, sizeof(struct house), 1, file);
+				if (_house.status.sigla == 'L') {
+					stdReadHouse(_house);
+				}
+			}
+			do{
+				printf("\nQual o registro do imovel que deseja alugar?  ");
+				scanf("%d", &registro);
+				if (registro < 0 || registro > imoveis) {
+					printf("\nRegistro invalido.");
+				}
+			}while (registro < 0 || registro > imoveis);
+			houses = malloc(imoveis*sizeof(struct house));
+			for (index = 0; index < imoveis; index++) {
+				fseek(file, index*sizeof(struct house), SEEK_SET);
+				fread((houses + index), sizeof(struct house), 1, file);
+			}
+			(houses + registro - 1)->status.sigla = 'A';
+			fclose(file);
+			file = fopen(IMOVEL_FILE, "wb");
+			fwrite(houses, sizeof(struct house), imoveis, file);
+		}
+	}
+	fclose(file);
 }
 
 
 // case LISTAR_LOCATARIOS
 void listar_locatarios() {
-
+	int index;
+	long locatarios;
+	struct locatario _locatario;
+	FILE *file = fopen(LOCATARIO_FILE, "rb");
+	if (file == NULL) {
+		printf("\nNenhum locatario registrado.");
+	}
+	else {
+		fseek(file, 0, SEEK_END);
+		locatarios = ftell(file) / sizeof(struct locatario);
+		for (index = 0; index < locatarios; index++) {
+			fseek(file, index*sizeof(struct locatario), SEEK_SET);
+			fread(&_locatario, sizeof(struct locatario), 1, file);
+			stdWriteLocatario(_locatario);
+		}
+	}
+	fclose(file);
 }
 
 // case TERMINAR_CONTRATO
