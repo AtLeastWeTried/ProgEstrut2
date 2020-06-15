@@ -195,29 +195,44 @@ int main() {
 }
 
 int getOptions() {
-	static int option;
+	int index;
+	static int option = 1;
+	char caracter, messages[][80] = {
+		"Sair",
+		"Cadastrar um proprietario",
+		"Cadastrar um imovel",
+		"Consultar proprietarios",
+		"Consultar imoveis",
+		"Aluguel imovel",
+		"Consultar locatarios",
+		"Termino do contrato",
+		"Alteracao de cadastros",
+		"Relatorio"
+	};
 	system("CLS");
-	printf("\nUtilize as setas do teclado(%d/%d) e ENTER para selecionar uma opcao.\n");
-	printf("[0] Sair\n");
-	printf("[1] Cadastro de proprietario\n");
-	printf("[2] Cadastrar casa\n");
-	printf("[3] Consultar proprietarios\n");
-	printf("[4] Consultar imoveis\n");
-	printf("[5] Aluguel imovel\n");
-	printf("[6] Consultar locatarios\n");
-	printf("[7] Termino do contrato\n");
-	printf("[8] Alteracao de cadastros\n");
-	printf("[9] Relatorio\n");
-	printf("Opcao: ");
-	scanf("%d", &option);
-	if (option >= 0 && option <= 9) {
-		return option;
-	}
-	else {
-		printf("\nOpcao errada!\n");
-		getch();
-		return getOptions();
-	}
+	do {
+		printf("\nUtilize as setas do teclado(%c/%c) e ENTER para selecionar uma opcao.\n", 24, 25);
+		for (index = 0; index < 10; index++) {
+			if (option == index) {
+				printf("\n> %s", messages[index]);
+			}
+			else {
+				printf("\n%s", messages[index]);
+			}
+		}
+		do {
+			caracter = getch();
+		} while ((caracter == 72 && option == 0) || (caracter == 80 && option == 9) || (caracter != 72 && caracter != 80 && caracter != 13));
+		if (caracter == 72 && option != 0) {
+			option = option - 1;
+			system("CLS");
+		}
+		else if (caracter == 80 && option != 9) {
+			option = option + 1;
+			system("CLS");
+		}
+	}	while(caracter != 13);
+	return option;
 }
 
 // case CRIAR_PROPRIETARIO
