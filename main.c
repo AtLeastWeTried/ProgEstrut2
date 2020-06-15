@@ -3,179 +3,36 @@
 #include <stdio.h>
 #include <conio.h>
 
-#define FILE_NAME "imovel.bin"
-
-struct test {
-	char name[30];
-};
-
-void test();
-void testMenu();
-int countTest();
-void readAllTest();
-void writeTest(struct test _test);
-void alterTest(char newName[30], int pos);
+int testMenu();
 
 int main() {
-	char newName[30];
-	int operador, pos;
-	struct test _test;
-	do {
-		getch();
-		system("CLS");
-		printf("[1] Cadastrar\n");
-		printf("[2] Consultar\n");
-		printf("[3] Alterar\n");
-		printf("Operador: ");
-		scanf("%d", &operador);
-		switch (operador) {
-			case 1:
-				printf("\nInforme um nome: ");
-				fflush(stdin);
-				gets(_test.name);
-				writeTest(_test);
-				break;
-			case 2:
-				readAllTest();
-				break;
-			case 3:
-				readAllTest();
-				printf("\nRegistro: ");
-				scanf("%d", &pos);
-				printf("\nQual o novo nome: ");
-				fflush(stdin);
-				gets(newName);
-				alterTest(newName, pos);
-				readAllTest();
-				break;
-			case 4: 
-				readAllTest();
-				test(1);
-				break;
-			case 5: 
-				while (getch() != 48) {
-					testMenu();
-				}
-				break;
-			default:
-				printf("\nOpcao errada!");
-				break;
-		}
-	} while(operador != 0);
+	printf("\noption: %d", testMenu());
 }
 
-void testMenu() {
+int testMenu() {
+	int index;
 	static int option = 0;
-	char caracter;
-	fflush(stdin);
-	caracter = getch();
-	if (caracter == 72 && option == 1) {
-		option = 0;
-	}
-	else if (caracter == 80 && option == 0) {
-		option = 1;
-	}
-	if (option == 0) {
+	char caracter, messages[][80] = { 
+		"first option!", 
+		"second option!" 
+	};
+	do {
 		system("CLS");
-		printf("\n> first option!");
-		printf("\nsecond option!");
-		printf("\n");
-	}
-	else if (option == 1) {
-		system("CLS");
-		printf("\nfirst option!");
-		printf("\n> second option!");
-		printf("\n");
-	}
-}
-
-// wb = sobrepoe
-void writeTest(struct test _test) {
-	FILE *file = fopen(FILE_NAME, "ab");
-	if (file == NULL) {
-		printf("\nErro ao abrir o arquivo.");
-	}
-	else {
-		fwrite(&_test, sizeof(struct test), 1, file);
-	}
-	fclose(file);
-}
-
-int countTest() {
-	long int count = 0;
-	FILE *fptr = NULL;
-	if ((fptr = fopen(FILE_NAME, "rb")) == NULL) {                
-		return count; 
-	}
-	else {
-		fseek(fptr, 0, 2);
-		count = ftell(fptr) / sizeof(struct test); 
-		fclose(fptr);                                   
-		return count;                                   
-	}
-}
-
-void readAllTest() {
-	int loop, index;
-	struct test _test;
-	FILE *file = fopen(FILE_NAME, "r");
-	if (file == NULL) {
-		printf("\nErro ao abrir o arquivo.");
-	}
-	else {
-		loop = countTest();
-		for (index = 0; index < loop; index++) {
-			fseek(file, index*sizeof(struct test), SEEK_SET);
-			fread(&_test, sizeof(struct test), 1, file);
-			printf("\n[%d]: Nome: %s", index, _test.name);
+		for (index = 0; index < 2; index++) {
+			if (option == index) {
+				printf("\n> %s", messages[index]);
+			}
+			else {
+				printf("\n%s", messages[index]);
+			}
 		}
-		printf("\n\n");
-	}
-	fclose(file);
-}
-
-void alterTest(char newName[30], int pos) {
-	int loop, index;
-	struct test *_test = NULL, current;
-	FILE *file = fopen(FILE_NAME, "rb");
-	if (file == NULL) {
-		printf("\nErro ao abrir o arquivo.");
-	}
-	else {
-		loop = countTest();
-		_test = malloc(loop*sizeof(struct test));
-		for (index = 0; index < loop; index++) {
-			fseek(file, index*sizeof(struct test), SEEK_SET);
-			fread(&current, sizeof(struct test), 1, file);
-			strcpy((_test + index)->name, current.name);
+		caracter = getch();
+		if (caracter == 72 && option == 1) {
+			option = 0;
 		}
-		fclose(file);
-		strcpy((_test + pos)->name, newName);
-		file = fopen(FILE_NAME, "wb");
-		fwrite(_test, sizeof(struct test), loop, file);
-	}
-	fclose(file);
-}
-
-void test(int pos) {
-	int loop, index;
-	struct test *_test = NULL, current;
-	FILE *file = fopen(FILE_NAME, "rb");
-	if (file == NULL) {
-		printf("\nErro ao abrir o arquivo.");
-	}
-	else {
-		loop = countTest();
-		_test = malloc(loop*sizeof(struct test));
-		for (index = 0; index < loop; index++) {
-			fseek(file, index*sizeof(struct test), SEEK_SET);
-			fread(&current, sizeof(struct test), 1, file);
-			strcpy((_test + index)->name, current.name);
+		else if (caracter == 80 && option == 0) {
+			option = 1;
 		}
-		fclose(file);
-		strcpy((_test + pos)->name, "test");
-		file = fopen(FILE_NAME, "wb");
-		fwrite(_test, sizeof(struct test), loop, file);
-	}
-	fclose(file);
+	}while (caracter != 13);
+	return option;
 }
